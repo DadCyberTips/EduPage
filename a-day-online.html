@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important} body{margin:0} img{max-width:100%}</style>
+<title>A Day Online</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a timeline strip of the day across the top; below it, the mock screen on the left and a coaching panel on the right (stacked on phones). */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --surface-2:#f6f8fa; --ink:#16212a; --muted:#5a6773; --line:#d4dbe2;
+  --accent:#1d5c74; --accent-ink:#ffffff; --accent-soft:#dcebf1;
+  --flag:#c4441d; --flag-soft:#fbe4da; --ok:#2c7a4c; --ok-soft:#dcefe3; --mark:#d99a0b; --mark-soft:#fdf0c6;
+  --bubble:#e7ebef; --alarm:#b3261e; --alarm-ink:#ffffff;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f161b; --surface:#172129; --surface-2:#1d2932; --ink:#e5ebf0; --muted:#94a3ae; --line:#2b3842;
+  --accent:#6bb4d0; --accent-ink:#0b1a21; --accent-soft:#1b3440;
+  --flag:#ff7f57; --flag-soft:#3b2219; --ok:#6fcb95; --ok-soft:#1b3426; --mark:#f2c14e; --mark-soft:#3a3115;
+  --bubble:#25323c; --alarm:#c2382f; --alarm-ink:#ffffff; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f161b; --surface:#172129; --surface-2:#1d2932; --ink:#e5ebf0; --muted:#94a3ae; --line:#2b3842;
+  --accent:#6bb4d0; --accent-ink:#0b1a21; --accent-soft:#1b3440;
+  --flag:#ff7f57; --flag-soft:#3b2219; --ok:#6fcb95; --ok-soft:#1b3426; --mark:#f2c14e; --mark-soft:#3a3115;
+  --bubble:#25323c; --alarm:#c2382f; --alarm-ink:#ffffff; color-scheme:dark }
+
+body{background:var(--bg); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.5}
+.wrap{max-width:1120px; margin:0 auto; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:20px 48px}
+h1,h2,h3{font-family:var(--display); text-wrap:balance; margin:0; line-height:1.15}
+button{font:inherit; cursor:pointer}
+:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+/* Header */
+.top{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px}
+.brand{display:flex; align-items:center; gap:10px}
+.brand-mark{width:30px; height:30px; border-radius:50%; background:conic-gradient(var(--flag) 0 25%, var(--accent) 0 100%); position:relative}
+.brand-mark::after{content:""; position:absolute; inset:7px; border-radius:50%; background:var(--bg)}
+.brand h1{font-size:1.35rem; font-weight:800; letter-spacing:-.01em}
+.score-pill{font-family:var(--mono); font-size:.85rem; background:var(--surface); border:1px solid var(--line); padding:4px 10px; border-radius:999px; font-variant-numeric:tabular-nums}
+
+/* Timeline */
+.timeline{display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:20px; scrollbar-width:thin}
+.tchip{flex:0 0 auto; font-family:var(--mono); font-size:.78rem; padding:5px 9px; border-radius:6px; background:var(--surface); border:1px solid var(--line); color:var(--muted); font-variant-numeric:tabular-nums}
+.tchip.now{background:var(--accent); color:var(--accent-ink); border-color:var(--accent)}
+.tchip.right{border-color:var(--ok); color:var(--ok)}
+.tchip.wrong{border-color:var(--flag); color:var(--flag)}
+
+/* Intro */
+.intro{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:28px; align-items:start}
+.intro h2{font-size:clamp(2rem, 5vw, 3.4rem); font-weight:800; letter-spacing:-.02em}
+.intro h2 em{font-style:normal; color:var(--flag)}
+.lede{font-size:1.1rem; color:var(--muted); max-width:60ch; margin:14px 0 22px}
+.steps{display:grid; gap:10px; margin:0 0 24px; padding:0; list-style:none; counter-reset:s}
+.steps li{display:flex; gap:12px; align-items:baseline; counter-increment:s}
+.steps li::before{content:counter(s); font-family:var(--mono); font-size:.8rem; font-weight:600; color:var(--accent); border:1.5px solid var(--accent); border-radius:50%; width:24px; height:24px; display:inline-grid; place-items:center; flex:0 0 auto}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:20px}
+.persona-head{display:flex; gap:14px; align-items:center; margin-bottom:12px}
+.persona-av{width:52px; height:52px; border-radius:50%; background:var(--accent-soft); color:var(--accent); display:grid; place-items:center; font-family:var(--display); font-weight:800; font-size:1.2rem}
+.persona-head h3{font-size:1.2rem}
+.persona-head p{margin:0; color:var(--muted); font-size:.95rem}
+.facts{display:grid; grid-template-columns:auto 1fr; gap:6px 14px; margin:14px 0 0; font-size:.95rem}
+.facts dt{color:var(--muted); font-family:var(--mono); font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; padding-top:3px}
+.facts dd{margin:0}
+.others{margin-top:16px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:.85rem; color:var(--muted)}
+.others span.tag{border:1px dashed var(--line); border-radius:999px; padding:3px 10px}
+.btn{border:0; border-radius:10px; padding:12px 18px; font-weight:700; background:var(--accent); color:var(--accent-ink)}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent; color:var(--ink); border:1.5px solid var(--line)}
+.btn.scam{background:var(--flag); color:#fff}
+.btn.safe{background:var(--ok); color:#fff}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn.scam, :root:not([data-theme="light"]) .btn.safe{color:#10181d}}
+:root[data-theme="dark"] .btn.scam, :root[data-theme="dark"] .btn.safe{color:#10181d}
+
+/* Play layout */
+.play{display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:24px; align-items:start}
+.stage-meta{display:flex; gap:10px; align-items:baseline; margin-bottom:10px; flex-wrap:wrap}
+.clock{font-family:var(--display); font-weight:800; font-size:2rem; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+.place{color:var(--muted)}
+.panel{position:sticky; top:calc(env(safe-area-inset-top, 0px) + 12px); display:grid; gap:14px}
+.context{font-size:1.05rem}
+.hint{color:var(--muted); font-size:.95rem; margin:0}
+.marked-count{font-family:var(--mono); font-size:.82rem; color:var(--mark)}
+.actions{display:flex; gap:10px; flex-wrap:wrap}
+.actions .btn{flex:1 1 140px}
+.verdict{display:flex; gap:10px; align-items:center; font-family:var(--display); font-weight:800; font-size:1.3rem}
+.verdict .dot{width:12px; height:12px; border-radius:50%}
+.verdict.right .dot{background:var(--ok)} .verdict.wrong .dot{background:var(--flag)}
+.scamname{font-family:var(--mono); font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted)}
+.flaglist{list-style:none; margin:0; padding:0; display:grid; gap:10px}
+.flaglist li{display:grid; grid-template-columns:26px minmax(0,1fr); gap:10px; align-items:start}
+.num{font-family:var(--mono); font-size:.75rem; font-weight:600; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; background:var(--flag); color:#fff}
+.num.ok{background:var(--ok)}
+.flaglist b{display:block}
+.flaglist .st{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; margin-left:6px}
+.st.found{color:var(--ok)} .st.missed{color:var(--flag)}
+.flaglist p{margin:2px 0 0; color:var(--muted); font-size:.95rem}
+.lesson{background:var(--accent-soft); border-radius:10px; padding:12px 14px}
+.lesson b{font-family:var(--mono); font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); display:block; margin-bottom:2px}
+.falsenote{font-size:.9rem; color:var(--muted)}
+
+/* Hotspots */
+.hot{cursor:pointer; border-radius:4px; transition:background .15s, box-shadow .15s; position:relative}
+.spot .hot:hover{background:var(--mark-soft)}
+.hot.marked{background:var(--mark-soft); box-shadow:0 0 0 2px var(--mark)}
+.reveal .hot{cursor:default}
+.reveal .hot.marked{background:transparent; box-shadow:none}
+.reveal .hot.is-flag{box-shadow:0 0 0 2px var(--flag); background:var(--flag-soft)}
+.reveal .hot.is-flag.missed{box-shadow:0 0 0 2px var(--flag); background:transparent; outline:2px dashed var(--flag); outline-offset:2px}
+.reveal .hot.is-ok{box-shadow:0 0 0 2px var(--ok); background:var(--ok-soft)}
+.reveal .hot.is-false{text-decoration:line-through; text-decoration-color:var(--muted); background:var(--surface-2)}
+.reveal .hot[data-n]::after{content:attr(data-n); position:absolute; top:-10px; right:-10px; width:18px; height:18px; border-radius:50%; background:var(--flag); color:#fff; font:600 11px/18px var(--mono); text-align:center; text-decoration:none}
+.reveal .hot.is-ok[data-n]::after{background:var(--ok)}
+.reveal .banner[data-n]::after{top:8px; right:10px}
+
+/* Mock: phone */
+.phone{max-width:360px; margin:0 auto; background:var(--surface); border:10px solid var(--ink); border-radius:34px; overflow:hidden; box-shadow:0 18px 40px -20px rgba(10,20,30,.45)}
+.phone-bar{display:flex; justify-content:space-between; padding:8px 18px 4px; font:600 .78rem var(--mono); color:var(--ink)}
+.sms-head{display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 14px 12px; border-bottom:1px solid var(--line)}
+.avatar{width:44px; height:44px; border-radius:50%; background:var(--bubble); display:grid; place-items:center; font-weight:700; color:var(--muted)}
+.sms-name{font-weight:700; font-size:.95rem; text-align:center}
+.sms-sub{font-size:.75rem; color:var(--muted)}
+.sms-body{padding:16px 14px 26px; display:grid; gap:8px; min-height:260px; align-content:start; background:var(--surface)}
+.bubble{background:var(--bubble); border-radius:18px 18px 18px 6px; padding:10px 13px; max-width:88%; font-size:.95rem; overflow-wrap:anywhere}
+.url{font-family:var(--mono); font-size:.85em; color:var(--accent); text-decoration:underline; overflow-wrap:anywhere}
+
+/* Mock: windows (email, chat, browser) */
+.win{background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:0 18px 40px -24px rgba(10,20,30,.45)}
+.win-bar{display:flex; align-items:center; gap:8px; padding:9px 12px; background:var(--surface-2); border-bottom:1px solid var(--line); font-size:.82rem; color:var(--muted)}
+.lights{display:flex; gap:5px} .lights i{width:10px; height:10px; border-radius:50%; background:var(--line); display:block}
+.addr{flex:1; min-width:0; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:4px 12px; font-family:var(--mono); font-size:.8rem; color:var(--ink); overflow-wrap:anywhere}
+.banner{display:block; background:var(--mark-soft); color:var(--ink); padding:8px 16px; font-size:.85rem; border-bottom:1px solid var(--line)}
+.mail-head{padding:14px 18px; border-bottom:1px solid var(--line); display:grid; gap:4px; font-size:.92rem}
+.mail-head .subj{font-family:var(--display); font-weight:700; font-size:1.2rem; margin-bottom:4px}
+.mail-head .lbl{color:var(--muted); display:inline-block; width:44px}
+.mail-body{padding:18px; font-size:.97rem; overflow-wrap:anywhere}
+.btnlink{display:inline-block; background:var(--accent); color:var(--accent-ink); padding:8px 16px; border-radius:6px; font-weight:700}
+.hoverurl{display:block; margin-top:8px; font-size:.8rem; color:var(--muted)}
+.chat-head{display:flex; gap:10px; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line); font-size:.92rem; flex-wrap:wrap}
+.ext{font-family:var(--mono); font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; background:var(--mark-soft); color:var(--ink); padding:1px 6px; border-radius:4px}
+.chat-body{padding:16px; display:grid; gap:10px; min-height:280px; align-content:start}
+.msg{display:grid; grid-template-columns:34px minmax(0,1fr); gap:10px}
+.msg .avatar{width:34px; height:34px; font-size:.8rem}
+.msg .who{font-size:.8rem; color:var(--muted)}
+.msg .who b{color:var(--ink)}
+.page{padding:20px; min-height:300px}
+.shop-brand{font-family:var(--display); font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:.9rem; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:16px}
+.shop-brand span{color:var(--flag); letter-spacing:.04em}
+.product{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:18px}
+.boot{aspect-ratio:1; max-width:100%; border-radius:10px; background:var(--surface-2); display:grid; place-items:center}
+.boot svg{width:70%; height:auto}
+.product h3{font-size:1.15rem; margin-bottom:6px}
+.price{font-family:var(--display); font-weight:800; font-size:1.5rem; color:var(--flag)}
+.price s{font-size:.95rem; color:var(--muted); font-weight:500}
+.product .stack{display:grid; gap:8px; align-content:start; font-size:.92rem}
+.timer{font-family:var(--mono); font-size:.85rem; color:var(--flag)}
+.alarm{background:var(--alarm); color:var(--alarm-ink); padding:28px 22px; text-align:center; display:grid; gap:12px; min-height:300px; align-content:center}
+.alarm h3{font-size:1.5rem; letter-spacing:.01em; color:var(--alarm-ink)}
+.alarm .shield{font-size:2.4rem; line-height:1}
+.alarm .call{font-family:var(--mono); font-weight:600; background:var(--alarm-ink); color:var(--alarm); padding:8px 12px; border-radius:6px; justify-self:center}
+.alarm .hot:hover{background:rgba(255,255,255,.18)}
+.post{padding:16px; display:grid; gap:12px}
+.post-head{display:flex; gap:10px; align-items:center; font-size:.9rem}
+.post-card{border-radius:10px; padding:26px 18px; text-align:center; background:linear-gradient(135deg, #7b3fa0, #d9488b); color:#fff; font-family:var(--display); font-weight:800; font-size:1.25rem; line-height:1.35}
+.post-card .hot:hover{background:rgba(255,255,255,.2)}
+.comments{display:grid; gap:6px; font-size:.9rem}
+.comments div{background:var(--surface-2); padding:6px 10px; border-radius:10px}
+.meta{font-size:.82rem; color:var(--muted)}
+
+/* Summary */
+.summary{display:grid; gap:22px}
+.sum-hero{display:grid; grid-template-columns:auto minmax(0,1fr); gap:24px; align-items:center}
+.big{font-family:var(--display); font-weight:800; font-size:clamp(3rem, 9vw, 5.5rem); line-height:1; color:var(--accent); font-variant-numeric:tabular-nums}
+.big small{font-size:.35em; color:var(--muted)}
+.stats{display:flex; gap:22px; flex-wrap:wrap; margin-top:8px}
+.stats div{font-size:.9rem; color:var(--muted)}
+.stats b{display:block; font-family:var(--display); font-size:1.5rem; color:var(--ink); font-variant-numeric:tabular-nums}
+.grid2{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px}
+.bars{display:grid; gap:12px}
+.bar-row{display:grid; gap:4px; font-size:.92rem}
+.bar-row .track{height:8px; border-radius:4px; background:var(--surface-2); overflow:hidden}
+.bar-row .fill{height:100%; background:var(--ok); border-radius:4px}
+.bar-row.weak .fill{background:var(--flag)}
+.bar-row .lbl{display:flex; justify-content:space-between; gap:8px}
+.bar-row .lbl span{font-family:var(--mono); font-size:.8rem; color:var(--muted); font-variant-numeric:tabular-nums}
+.cheat{list-style:none; margin:0; padding:0; display:grid; gap:10px}
+.cheat li b{display:block}
+.cheat li span{color:var(--muted); font-size:.93rem}
+.card h3{font-size:1.1rem; margin-bottom:12px}
+
+@media (max-width:860px){
+  .play, .intro, .grid2{grid-template-columns:minmax(0,1fr)}
+  .panel{position:static}
+  .product{grid-template-columns:minmax(0,1fr)}
+  .boot{max-width:200px}
+  .sum-hero{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="brand-mark" aria-hidden="true"></div><h1>A Day Online</h1></div>
+    <div class="score-pill" id="scorePill">Score 0</div>
+  </header>
+  <nav class="timeline" id="timeline" aria-label="Your day"></nav>
+  <main id="app"></main>
+</div>
+
+<script>
+const H = (id, html, cls='') => `<span class="hot ${cls}" data-f="${id}" tabindex="0" role="button" aria-pressed="false">${html}</span>`;
+
+const CATS = {
+  urgency: ['Pressure to act fast', 'Real organizations give you time. A countdown, threat or alarm is your cue to slow down.'],
+  sender:  ["Sender doesn't check out", 'Look at the real address or number, not the display name. Strangers and lookalikes are warning signs.'],
+  link:    ["Web address doesn't match", 'Read the domain just before the first single slash. Lookalikes add words or misspell the real name.'],
+  payment: ['Strange way to pay', 'Gift cards, Zelle, Cash App, crypto, or a tiny "fee" are how scammers get paid or get your card number.'],
+  data:    ['Asks for codes, ID or personal details', 'Never share sign-in codes, passwords, ID photos or security answers with someone who contacted you.'],
+  contact: ['Wants you to call or message them', 'Contact companies using details you find yourself: the back of your card, the official website or app.'],
+  toogood: ['Too good to be true', 'Huge discounts, easy money and no-interview jobs are bait.'],
+  secrecy: ['Secrecy or switching apps', '"Keep this between us" or "message me on Telegram" means they want to avoid anyone checking.'],
+};
+
+const phone = (time, {av, name, sub, msgs}) => `
+  <div class="phone"><div class="phone-bar"><span>${time.replace(/ (AM|PM)/,'')}</span><span>5G ▮▮▮</span></div>
+  <div class="sms-head"><div class="avatar">${av}</div><div class="sms-name">${name}</div><div class="sms-sub">${sub}</div></div>
+  <div class="sms-body">${msgs.map(m=>`<div class="bubble">${m}</div>`).join('')}</div></div>`;
+const win = (bar, inner) => `<div class="win"><div class="win-bar"><div class="lights"><i></i><i></i><i></i></div>${bar}</div>${inner}</div>`;
+const BOOT = `<svg viewBox="0 0 120 100" aria-hidden="true"><path d="M30 10h34l4 40 34 14c8 4 10 10 10 18v6H18l-2-10 8-6z" fill="#8a5a32"/><path d="M16 88h96v8H16z" fill="#2b2b2b"/><path d="M34 22h28M34 32h30M34 42h32" stroke="#e7c9a2" stroke-width="3"/></svg>`;
+
+const SCENES = [
+{ time:'6:52 AM', place:'Kitchen, phone', verdict:'scam', name:'Fake delivery text',
+  context:"You're making coffee. You did order a few things online this week, so a delivery text doesn't seem strange.",
+  screen: t => phone(t, {av:'#', name:H('f1','+1 (213) 555-0187'), sub:'Text message · Today 6:52 AM', msgs:[
+    `${H('n1','ParcelPoint:')} Your package #PP48211 is on hold due to an incomplete address. ${H('f2','Update within 24 hrs to avoid return')}: ${H('f3','https://parcelpoint-redelivery.co/t/48211','url')} ${H('f4','Redelivery fee: $1.99')}`]}),
+  flags:[
+    {id:'f1', cat:'sender', label:'A regular phone number', why:'Delivery companies text from short codes and use the tracking number from your actual order.'},
+    {id:'f2', cat:'urgency', label:'24-hour deadline', why:'The deadline is there to rush you past thinking.'},
+    {id:'f3', cat:'link', label:'Lookalike web address', why:'"parcelpoint-redelivery.co" is not the carrier\'s site. Anyone can register a name like this.'},
+    {id:'f4', cat:'payment', label:'Tiny fee', why:"They don't want $1.99. They want your full card number for bigger charges later."}],
+  lesson:"Don't tap the link. Open the store or carrier app you actually ordered from and check tracking there." },
+
+{ time:'7:35 AM', place:'Personal email', verdict:'safe', name:'Real school message',
+  context:'Checking email before the school run. Your daughter mentioned a science center trip at dinner last night.',
+  screen: () => win('<span>Mail</span>', `<div class="mail-head"><div class="subj">Grade 7 science center trip: permission form due Friday</div>
+    <div><span class="lbl">From</span>${H('f1','Maple Ridge Middle School &lt;office@mapleridge.k12.oh.us&gt;')}</div><div><span class="lbl">To</span>Grade 7 Families</div></div>
+    <div class="mail-body">Dear Grade 7 families,<br><br>On November 13 our Grade 7 classes will visit the Columbus Science Center. ${H('f2','Please sign the permission form in the parent portal by Friday.')} ${H('f4','There is no cost to families')}; the PTA is covering admission.<br><br>${H('f3','Open the parent portal','btnlink')}<br><br>Questions? Call the front office at the number on our website.<br><br>Ms. Patel<br>Grade 7 Team Lead</div>`),
+  flags:[
+    {id:'f1', ok:true, label:"The school's usual address", why:'Same official school domain your past newsletters came from.'},
+    {id:'f2', ok:true, label:'A relaxed deadline', why:'Several days away, for something you were already expecting.'},
+    {id:'f3', ok:true, label:'Portal button', why:'It goes to the portal you already use. Opening the portal from your own bookmark or app is still the best habit.'},
+    {id:'f4', ok:true, label:'Nothing to pay', why:'No money and no passwords requested.'}],
+  lesson:'Real messages are expected, give you time, and don\'t ask for money or passwords. Not everything is a scam, and spotting the safe ones matters too.' },
+
+{ time:'8:48 AM', place:'Work laptop, Outlook', verdict:'scam', name:'Password phishing email',
+  context:'First email of the workday. You work at Halvern Logistics; company email addresses end in @halvern.com.',
+  screen: () => win('<span>Inbox · chris.morgan@halvern.com</span>', `${H('f1','[EXTERNAL] This message came from outside Halvern Logistics. Be careful with links.','banner')}
+    <div class="mail-head"><div class="subj">${H('n1','Mailbox password expires today')}</div>
+    <div><span class="lbl">From</span>IT Service Desk ${H('f2','&lt;servicedesk@halvern-it-support.com&gt;')}</div><div><span class="lbl">To</span>chris.morgan@halvern.com</div></div>
+    <div class="mail-body">${H('f3','Dear User,')}<br><br>Your Halvern mailbox password ${H('f4','expires in 2 hours')}. To keep your current password and avoid losing access to email, verify your account below.<br><br>${H('n2','Keep My Password','btnlink')}
+    <span class="hoverurl">Hover preview: ${H('f5','https://halvern-login.microsft-verify.com/auth','url')}</span><br>Thank you,<br>${H('n3','IT Service Desk')}</div>`),
+  flags:[
+    {id:'f1', cat:'sender', label:'External sender warning', why:'Your own IT team emails you from inside the company. Your mail system flagged this as outside.'},
+    {id:'f2', cat:'sender', label:'Not halvern.com', why:'"halvern-it-support.com" is a different domain that anyone could buy.'},
+    {id:'f3', cat:'sender', label:'"Dear User"', why:'Your IT team knows your name. A generic greeting means a mass mailing.'},
+    {id:'f4', cat:'urgency', label:'Expires in 2 hours', why:'Fear of losing email access is meant to rush you.'},
+    {id:'f5', cat:'link', label:'Misspelled link', why:'The real domain is "microsft-verify.com" (note the missing o). A fake sign-in page there would steal your password.'}],
+  lesson:'Use the Report Phishing button or forward it to IT. Real password changes happen in your normal company sign-in, which you open yourself.' },
+
+{ time:'10:12 AM', place:'Work chat', verdict:'scam', name:'CEO gift card scam',
+  context:"You're between meetings when a chat pops up from someone using the CEO's name.",
+  screen: () => win('<span>Halvern Chat</span>', `<div class="chat-head"><div class="avatar">RL</div>${H('f1','<b>Rebecca Lowe (CEO)</b> <span class="ext">External</span> rebecca.lowe.ceo@gmail.com')}</div>
+    <div class="chat-body">${[
+      `${H('n1','Hi Chris, are you at your desk?')}`,
+      `${H('f2',"I'm heading into a board meeting and can't take calls.")} I need a quick favor.`,
+      `Please buy ${H('f3','6 x $200 store gift cards')} for some client thank-yous. ${H('n2',"I'll reimburse you today.")}`,
+      `${H('f4','Keep this between us for now')}, it's a surprise. ${H('f5','Send me photos of the codes on the back')} once you have them.`
+    ].map(m=>`<div class="msg"><div class="avatar">RL</div><div><div class="who"><b>Rebecca Lowe</b> 10:12 AM</div>${m}</div></div>`).join('')}</div>`),
+  flags:[
+    {id:'f1', cat:'sender', label:'Personal Gmail, marked External', why:"Your CEO would message from a company account, not Gmail."},
+    {id:'f2', cat:'urgency', label:"Can't take calls", why:'This blocks the one thing that would expose the scam: a quick phone call.'},
+    {id:'f3', cat:'payment', label:'Gift cards', why:'Gift cards are untraceable cash. No real company thanks clients this way.'},
+    {id:'f4', cat:'secrecy', label:'Keep it secret', why:'Secrecy stops you from asking a coworker who would spot it.'},
+    {id:'f5', cat:'data', label:'Photos of the codes', why:'The codes are the money. Once sent, it\'s gone for good.'}],
+  lesson:"Verify through a channel you already trust: call the person using the company directory, or check with their assistant. Then report it to IT." },
+
+{ time:'11:26 AM', place:'ProNet (professional network)', verdict:'scam', name:'Fake job offer',
+  context:"You've been quietly open to new roles. A recruiter message lands in your ProNet inbox.",
+  screen: () => win('<span>ProNet · Messaging</span>', `<div class="chat-head"><div class="avatar">SW</div>${H('f1','<b>Sarah Whitfield</b> · Talent Partner, Global Remote Staffing · 3rd · 41 connections')}</div>
+    <div class="chat-body"><div class="msg"><div class="avatar">SW</div><div><div class="who"><b>Sarah Whitfield</b> 11:26 AM</div>
+    Hi Chris, ${H('n1','your profile is an excellent match')} for a fully remote Operations Coordinator role. ${H('f2','$85/hr for 20 hrs a week, no interview needed.')}<br><br>${H('f3','Please message our hiring manager on Telegram @GRS_hiring')} and ${H('f4',"send a photo of your driver's license")} to begin onboarding.</div></div></div>`),
+  flags:[
+    {id:'f1', cat:'sender', label:'Thin profile, vague company', why:'Few connections and a generic company name. Look the person up on the company\'s own website.'},
+    {id:'f2', cat:'toogood', label:'High pay, no interview', why:'Real jobs at that rate always involve interviews.'},
+    {id:'f3', cat:'secrecy', label:'Move to Telegram', why:"Leaving the platform takes you away from its scam protections and reporting."},
+    {id:'f4', cat:'data', label:'ID photo up front', why:'An ID photo lets them open accounts in your name. Employers collect ID after a written offer, through HR.'}],
+  lesson:"Real recruiters use company email, interview you, and ask for ID only after a formal offer. Check the company's careers page yourself." },
+
+{ time:'12:18 PM', place:'Lunch break, browser', verdict:'scam', name:'Fake online store',
+  context:'A sponsored post shows hiking boots you looked at last month, at a huge discount.',
+  screen: () => win(`<div class="addr">${H('f1','https://northpeak-outlet-sale.shop/boots','url')}</div>`, `<div class="page">
+    <div class="shop-brand">NorthPeak <span>Official Clearance</span></div>
+    <div class="product"><div class="boot">${BOOT}</div><div class="stack">
+      <h3>Ridgeline Waterproof Hiking Boot</h3>
+      <div>${H('f2','<span class="price">$34.99 <s>$229.99</s></span> 85% OFF')}</div>
+      <div>${H('n1','★★★★★ 4.9 (3,212 reviews)')}</div>
+      <div class="timer">${H('f3','Sale ends in 09:41 · Only 2 left in your size')}</div>
+      <div>${H('f4','We accept Zelle, Cash App and gift cards')}</div>
+      <div>${H('n2','Add to cart','btnlink')}</div></div></div></div>`),
+  flags:[
+    {id:'f1', cat:'link', label:'Odd web address', why:'A brand\'s store lives on its own domain. "outlet-sale.shop" is a throwaway address.'},
+    {id:'f2', cat:'toogood', label:'85% off', why:'Popular gear at a fraction of the price is the classic bait.'},
+    {id:'f3', cat:'urgency', label:'Countdown and "only 2 left"', why:'Fake scarcity stops you from researching the site.'},
+    {id:'f4', cat:'payment', label:'No credit cards', why:"Card payments can be disputed and reversed. These can't."}],
+  lesson:'Buy from the brand\'s own site or a store you know. Pay by credit card so you can dispute a charge if something goes wrong.' },
+
+{ time:'2:05 PM', place:'Work laptop, browser', verdict:'scam', name:'Tech support pop-up',
+  context:'You open a recipe link a friend shared. The screen turns red and an alarm starts beeping.',
+  screen: () => win(`<div class="addr">${H('f1','http://secure-alert-pc-check.xyz/warn','url')}</div>`, `<div class="alarm">
+    <div class="shield" aria-hidden="true">⚠</div>
+    <h3>${H('f2','YOUR COMPUTER HAS BEEN BLOCKED')}</h3>
+    <div>${H('n1','Error #0x268d3')}: Trojan spyware detected. Your passwords and banking details are at risk.</div>
+    <div>${H('f3','Do not restart or close this window.')}</div>
+    <div class="call">${H('f4','Call Security Support: 1-888-555-0143')}</div></div>`),
+  flags:[
+    {id:'f1', cat:'link', label:'Random website', why:'Real security warnings come from software on your computer, not a .xyz website.'},
+    {id:'f2', cat:'urgency', label:'All-caps alarm', why:'Sirens and scary text are designed to make you panic.'},
+    {id:'f3', cat:'urgency', label:"Don't close this window", why:"Closing it is exactly what you should do. They say not to because it ends the scam."},
+    {id:'f4', cat:'contact', label:'A number to call', why:'Whoever answers will ask for remote access to your computer and payment for fake repairs.'}],
+  lesson:"Close the browser tab or the whole browser (force quit if you have to). Then tell your IT help desk. Never call a number on a pop-up." },
+
+{ time:'3:40 PM', place:'In a meeting, phone', verdict:'scam', name:'Bank impersonation',
+  context:'You bank with Coastline Bank. Your phone buzzes during a meeting.',
+  screen: t => phone(t, {av:'#', name:H('n1','+1 (305) 555-0128'), sub:'Text message · Today 3:40 PM', msgs:[
+    `Coastline Bank: ${H('f2','Suspicious sign-in on your account from Lagos, Nigeria.')} If this was NOT you, ${H('f1','call our Fraud Team now at 1-877-555-0119')}.`,
+    `${H('f3','A specialist will text you a verification code. Read it back to them to secure your account.')}`]}),
+  flags:[
+    {id:'f1', cat:'contact', label:'Number given in the text', why:'Call the number on the back of your card instead, never one sent to you.'},
+    {id:'f2', cat:'urgency', label:'Scary, specific alert', why:'A foreign sign-in is meant to make you call without thinking.'},
+    {id:'f3', cat:'data', label:'Read back a code', why:'That code signs someone into your account. Your bank will never ask you to read it out.'}],
+  lesson:'Call the number on the back of your card or open your banking app yourself. A sign-in code is for you to type, never to say to anyone.' },
+
+{ time:'5:20 PM', place:'Commute, phone', verdict:'safe', name:'Real sign-in code',
+  context:'On the train, you open the Coastline Bank app and tap Sign in to pay the water bill. A text arrives a few seconds later.',
+  screen: t => phone(t, {av:'CB', name:H('f1','72641'), sub:'Text message · Today 5:20 PM', msgs:[
+    `Coastline Bank: ${H('f2','Your sign-in code is 481 927')}. ${H('f3','It expires in 10 minutes.')} Coastline will never call or text to ask for this code.`]}),
+  flags:[
+    {id:'f1', ok:true, label:'Short code sender', why:'Banks send automated texts from short codes. More importantly, it arrived right as you signed in.'},
+    {id:'f2', ok:true, label:'The code', why:'You asked for it. Type it into the app and nowhere else.'},
+    {id:'f3', ok:true, label:'10-minute expiry', why:'A short expiry is a security feature, and you started the process yourself.'}],
+  lesson:"A code you requested, arriving when you requested it, is expected. If one arrives when you didn't sign in, someone may have your password: change it." },
+
+{ time:'7:05 PM', place:'Couch, social media', verdict:'scam', name:'Data-harvesting quiz',
+  context:'Scrolling after dinner. Your cousin shared a fun quiz and half your family has already answered.',
+  screen: () => win('<span>Social feed</span>', `<div class="post">
+    <div class="post-head"><div class="avatar">FF</div>${H('f1','<b>Fun Facts Fan Page</b> · shared by your cousin Dana<br><span class="meta">Page created 3 weeks ago</span>')}</div>
+    <div class="post-card">What's your ROCKSTAR NAME? 🎸<br>${H('f2','Your first pet + the street you grew up on!')}<br>${H('f3','Comment yours below 👇')}</div>
+    <div class="meta">${H('n1','1.4K likes · 892 comments')}</div>
+    <div class="comments"><div><b>Dana K.</b> Biscuit Elmwood 😂</div><div><b>Tom R.</b> Rusty Lakeview!!</div></div></div>`),
+  flags:[
+    {id:'f1', cat:'sender', label:'New, generic page', why:'Pages like this collect engagement and answers, then get sold or used for scams.'},
+    {id:'f2', cat:'data', label:'Pet + childhood street', why:'Those are classic security questions for banks and email accounts.'},
+    {id:'f3', cat:'data', label:'Answer in public', why:'Comments sit next to your full name, so anyone can collect the answers.'}],
+  lesson:"Skip these quizzes. If an account uses security questions, give made-up answers and save them in a password manager." },
+
+{ time:'9:24 PM', place:'Winding down, phone', verdict:'scam', name:'"Wrong number" opener',
+  context:"You're about to go to bed when a friendly text arrives from a number you don't know.",
+  screen: t => phone(t, {av:'?', name:H('f1','+1 (646) 555-0172'), sub:'Text message · Today 9:24 PM', msgs:[
+    `${H('f2','Hi Jenny')}, it's Michael from the club. ${H('n1','Are we still on for golf at Pinecrest this Saturday?')}`]}),
+  flags:[
+    {id:'f1', cat:'sender', label:'Unknown number', why:"Someone you've never heard from, late in the evening."},
+    {id:'f2', cat:'sender', label:'The wrong name', why:"It's the hook. Polite people reply \"wrong number\", which starts a friendly chat that can turn into a crypto or romance scam weeks later."}],
+  lesson:"Don't reply, not even to say wrong number. Block the number and delete the message." },
+];
+
+let state = { i:-1, phase:'spot', results:[] };
+const app = document.getElementById('app');
+
+function totalScore(){ return state.results.reduce((s,r)=>s+(r?r.points:0),0); }
+
+function renderTimeline(){
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = SCENES.map((s,k)=>{
+    const r = state.results[k];
+    const cls = k===state.i ? 'now' : r ? (r.correct?'right':'wrong') : '';
+    return `<span class="tchip ${cls}">${s.time}</span>`;
+  }).join('');
+  document.getElementById('scorePill').textContent = `Score ${totalScore()}`;
+  const now = tl.querySelector('.now'); if(now) now.scrollIntoView({block:'nearest', inline:'center'});
+}
+
+function renderIntro(){
+  app.innerHTML = `<section class="intro">
+    <div>
+      <h2>Spot the <em>scams</em> hiding in an ordinary day.</h2>
+      <p class="lede">Eleven moments from a normal Tuesday: texts, work email, chats, shopping and social media. Some are scams. Some are perfectly fine. Your job is to tell them apart.</p>
+      <ol class="steps"><li>Tap anything on the screen that looks off.</li><li>Decide: scam or safe?</li><li>See every red flag, what you missed, and what to do instead.</li></ol>
+      <button class="btn" data-act="start">Start the day at 6:52 AM</button>
+    </div>
+    <div class="card">
+      <div class="persona-head"><div class="persona-av">CM</div><div><h3>Chris Morgan, 44</h3><p>Working professional</p></div></div>
+      <dl class="facts">
+        <dt>Work</dt><dd>Operations manager at Halvern Logistics</dd>
+        <dt>Home</dt><dd>Two kids, one in middle school, a mortgage</dd>
+        <dt>Devices</dt><dd>Work laptop, personal phone</dd>
+        <dt>Online</dt><dd>Online shopping, ProNet, family social media</dd>
+      </dl>
+      <div class="others">More days coming: <span class="tag">Retiree</span><span class="tag">Teen</span><span class="tag">Small business owner</span></div>
+    </div></section>`;
+}
+
+function renderScene(){
+  const s = SCENES[state.i], r = state.results[state.i];
+  const reveal = state.phase==='reveal';
+  let panel;
+  if(!reveal){
+    panel = `<p class="context">${s.context}</p>
+      <p class="hint">Tap anything that looks suspicious. Tap again to unmark. <span class="marked-count" id="mc">0 marked</span></p>
+      <div class="actions"><button class="btn scam" data-act="verdict" data-v="scam">Scam or risky</button><button class="btn safe" data-act="verdict" data-v="safe">Looks safe</button></div>`;
+  } else {
+    const isScam = s.verdict==='scam';
+    const items = s.flags.map((f,k)=>{
+      const st = f.ok ? '' : `<span class="st ${r.foundIds.includes(f.id)?'found':'missed'}">${r.foundIds.includes(f.id)?'Spotted':'Missed'}</span>`;
+      return `<li><span class="num ${f.ok?'ok':''}">${k+1}</span><div><b>${f.label}${st}</b><p>${f.why}</p></div></li>`;
+    }).join('');
+    const nextLabel = state.i < SCENES.length-1 ? `Next: ${SCENES[state.i+1].time}` : 'See how you did';
+    panel = `<div><div class="scamname">${s.name}</div>
+      <div class="verdict ${r.correct?'right':'wrong'}"><span class="dot"></span>${r.correct ? (isScam?'Right, this is a scam.':'Right, this one is safe.') : (isScam?'Not quite. This is a scam.':'Not quite. This one is safe.')}</div></div>
+      ${isScam ? `<p class="hint">You spotted ${r.found} of ${r.total} red flags.</p>` : `<p class="hint">Why it checks out:</p>`}
+      <ul class="flaglist">${items}</ul>
+      ${r.falseAlarms ? `<p class="falsenote">${r.falseAlarms} thing${r.falseAlarms>1?'s':''} you marked ${r.falseAlarms>1?'were':'was'} not a red flag (shown crossed out).</p>` : ''}
+      <div class="lesson"><b>What to do</b>${s.lesson}</div>
+      <button class="btn" data-act="next">${nextLabel} →</button>`;
+  }
+  app.innerHTML = `<section class="play">
+    <div class="stage ${reveal?'reveal':'spot'}" id="stage"><div class="stage-meta"><span class="clock">${s.time}</span><span class="place">${s.place}</span></div>${s.screen(s.time)}</div>
+    <aside class="panel card">${panel}</aside></section>`;
+  if(reveal) decorate(s, r);
+}
+
+function decorate(s, r){
+  document.querySelectorAll('#stage .hot').forEach(el=>{
+    const id = el.dataset.f, k = s.flags.findIndex(f=>f.id===id), f = s.flags[k];
+    if(r.marked.includes(id)) el.classList.add('marked');
+    el.removeAttribute('tabindex'); el.removeAttribute('role');
+    if(f){ el.dataset.n = k+1; el.classList.add(f.ok?'is-ok':'is-flag'); if(!f.ok && !r.marked.includes(id)) el.classList.add('missed'); }
+    else if(r.marked.includes(id)) el.classList.add('is-false');
+  });
+}
+
+function renderSummary(){
+  const rs = state.results;
+  const correct = rs.filter(r=>r.correct).length;
+  const found = rs.reduce((a,r)=>a+r.found,0), total = rs.reduce((a,r)=>a+r.total,0);
+  const falses = rs.reduce((a,r)=>a+r.falseAlarms,0);
+  const max = SCENES.length*10 + total*5;
+  const cats = {};
+  SCENES.forEach((s,k)=>s.flags.forEach(f=>{ if(f.ok) return; cats[f.cat] ??= {hit:0,all:0}; cats[f.cat].all++; if(rs[k].foundIds.includes(f.id)) cats[f.cat].hit++; }));
+  const rows = Object.entries(cats).sort((a,b)=>(a[1].hit/a[1].all)-(b[1].hit/b[1].all)).map(([c,v])=>{
+    const pct = Math.round(v.hit/v.all*100);
+    return `<div class="bar-row ${pct<60?'weak':''}"><div class="lbl">${CATS[c][0]}<span>${v.hit}/${v.all}</span></div><div class="track"><div class="fill" style="width:${pct}%"></div></div></div>`;
+  }).join('');
+  const weakest = Object.entries(cats).sort((a,b)=>(a[1].hit/a[1].all)-(b[1].hit/b[1].all))[0];
+  app.innerHTML = `<section class="summary">
+    <div class="card sum-hero"><div class="big">${totalScore()}<small> / ${max}</small></div>
+      <div><h2>End of the day, Chris.</h2>
+      <p class="hint">${weakest && weakest[1].hit<weakest[1].all ? `Your biggest blind spot: <b>${CATS[weakest[0]][0].toLowerCase()}</b>.` : 'You caught every type of red flag. Nicely done.'}</p>
+      <div class="stats"><div><b>${correct}/${SCENES.length}</b>right calls</div><div><b>${found}/${total}</b>red flags spotted</div><div><b>${falses}</b>false alarms</div></div></div></div>
+    <div class="grid2">
+      <div class="card"><h3>Red flags by type</h3><div class="bars">${rows}</div></div>
+      <div class="card"><h3>Your pocket checklist</h3><ul class="cheat">${Object.values(CATS).map(([t,d])=>`<li><b>${t}</b><span>${d}</span></li>`).join('')}</ul></div>
+    </div>
+    <div class="actions"><button class="btn" data-act="restart">Play the day again</button></div></section>`;
+}
+
+function render(){
+  renderTimeline();
+  if(state.i<0) renderIntro();
+  else if(state.i>=SCENES.length) renderSummary();
+  else renderScene();
+}
+
+function toggle(el){
+  if(state.phase!=='spot') return;
+  const on = el.classList.toggle('marked');
+  el.setAttribute('aria-pressed', on);
+  const n = document.querySelectorAll('#stage .hot.marked').length;
+  const mc = document.getElementById('mc'); if(mc) mc.textContent = `${n} marked`;
+}
+
+app.addEventListener('click', e=>{
+  const hot = e.target.closest('.hot'); if(hot){ toggle(hot); return; }
+  const b = e.target.closest('[data-act]'); if(!b) return;
+  const act = b.dataset.act;
+  if(act==='start'){ state.i=0; state.phase='spot'; }
+  if(act==='verdict'){
+    const s = SCENES[state.i];
+    const marked = [...document.querySelectorAll('#stage .hot.marked')].map(x=>x.dataset.f);
+    const bad = s.flags.filter(f=>!f.ok);
+    const foundIds = bad.filter(f=>marked.includes(f.id)).map(f=>f.id);
+    const falseAlarms = marked.filter(id=>!s.flags.some(f=>f.id===id)).length;
+    const correct = b.dataset.v===s.verdict;
+    state.results[state.i] = {marked, foundIds, found:foundIds.length, total:bad.length, falseAlarms, correct, points:(correct?10:0)+foundIds.length*5};
+    state.phase='reveal';
+  }
+  if(act==='next'){ state.i++; state.phase='spot'; }
+  if(act==='restart'){ state = {i:-1, phase:'spot', results:[]}; }
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+app.addEventListener('keydown', e=>{
+  const hot = e.target.closest('.hot');
+  if(hot && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); toggle(hot); }
+});
+render();
+</script>
+</body>
+</html>
