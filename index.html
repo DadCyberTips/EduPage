@@ -1,0 +1,1523 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data: blob:; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<style>[hidden]{display:none!important} body{margin:0} img{max-width:100%}</style>
+<title>A Day Online</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: landing = hero + five age-group cards. Game = timeline strip, mock screen left, coaching panel right (stacked on phones). */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --surface-2:#f6f8fa; --ink:#16212a; --muted:#5a6773; --line:#d4dbe2;
+  --accent:#1d5c74; --accent-ink:#ffffff;
+  --flag:#c4441d; --flag-soft:#fbe4da; --ok:#2c7a4c; --ok-soft:#dcefe3; --mark:#d99a0b; --mark-soft:#fdf0c6;
+  --bubble:#e7ebef; --alarm:#b3261e; --alarm-ink:#ffffff;
+  --c-kids:#b5541a; --c-teens:#6a3fb5; --c-young:#1b6f69; --c-thirties:#5b6b12; --c-hr:#2f7a3a; --c-rd:#8a6a00; --c-adults:#1d5c74; --c-seniors:#8a3b5a;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f161b; --surface:#172129; --surface-2:#1d2932; --ink:#e5ebf0; --muted:#94a3ae; --line:#2b3842;
+  --accent:#6bb4d0; --accent-ink:#0b1a21;
+  --flag:#ff7f57; --flag-soft:#3b2219; --ok:#6fcb95; --ok-soft:#1b3426; --mark:#f2c14e; --mark-soft:#3a3115;
+  --bubble:#25323c; --alarm:#c2382f; --alarm-ink:#ffffff;
+  --c-kids:#f0a36b; --c-teens:#b79af0; --c-young:#6cc9c1; --c-thirties:#bcd36a; --c-hr:#8fd49a; --c-rd:#e6c35c; --c-adults:#6bb4d0; --c-seniors:#e59ab8; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f161b; --surface:#172129; --surface-2:#1d2932; --ink:#e5ebf0; --muted:#94a3ae; --line:#2b3842;
+  --accent:#6bb4d0; --accent-ink:#0b1a21;
+  --flag:#ff7f57; --flag-soft:#3b2219; --ok:#6fcb95; --ok-soft:#1b3426; --mark:#f2c14e; --mark-soft:#3a3115;
+  --bubble:#25323c; --alarm:#c2382f; --alarm-ink:#ffffff;
+  --c-kids:#f0a36b; --c-teens:#b79af0; --c-young:#6cc9c1; --c-thirties:#bcd36a; --c-hr:#8fd49a; --c-rd:#e6c35c; --c-adults:#6bb4d0; --c-seniors:#e59ab8; color-scheme:dark }
+:root, .wrap{--accent-soft:color-mix(in srgb, var(--accent) 14%, var(--surface))}
+
+body{background:var(--bg); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.5}
+.wrap{max-width:1120px; margin:0 auto; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:20px 48px}
+.wrap.g-kids{font-size:17px}
+h1,h2,h3{font-family:var(--display); text-wrap:balance; margin:0; line-height:1.15}
+button{font:inherit; cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+.top{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px}
+.brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink)}
+.brand-mark{width:30px; height:30px; border-radius:50%; background:conic-gradient(var(--flag) 0 25%, var(--accent) 0 100%); position:relative}
+.brand-mark::after{content:""; position:absolute; inset:7px; border-radius:50%; background:var(--bg)}
+.brand h1{font-size:1.35rem; font-weight:800; letter-spacing:-.01em}
+.topright{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.score-pill{font-family:var(--mono); font-size:.85rem; background:var(--surface); border:1px solid var(--line); padding:4px 10px; border-radius:999px; font-variant-numeric:tabular-nums}
+.back{font-size:.92rem; text-decoration:none; font-weight:600}
+
+.timeline{display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:20px; scrollbar-width:thin}
+.tchip{flex:0 0 auto; font-family:var(--mono); font-size:.78rem; padding:5px 9px; border-radius:6px; background:var(--surface); border:1px solid var(--line); color:var(--muted); font-variant-numeric:tabular-nums}
+.tchip.now{background:var(--accent); color:var(--accent-ink); border-color:var(--accent)}
+.tchip.right{border-color:var(--ok); color:var(--ok)}
+.tchip.wrong{border-color:var(--flag); color:var(--flag)}
+
+/* Landing */
+.hero{display:grid; gap:14px; margin:12px 0 28px; max-width:780px}
+.hero h2{font-size:clamp(2.1rem, 5.5vw, 3.6rem); font-weight:800; letter-spacing:-.02em}
+.hero h2 em{font-style:normal; color:var(--flag)}
+.lede{font-size:1.12rem; color:var(--muted); max-width:62ch; margin:0}
+.how{display:flex; flex-wrap:wrap; gap:8px 22px; font-size:.95rem; color:var(--muted); margin:0; padding:0; list-style:none}
+.how b{color:var(--ink)}
+.groups{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap:16px}
+.gcard{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:20px; display:grid; gap:10px; align-content:start; text-decoration:none; color:var(--ink); transition:border-color .15s, transform .15s}
+.gcard:hover{border-color:var(--gc); transform:translateY(-2px)}
+.gcard .ages{font-family:var(--display); font-weight:800; font-size:2.4rem; line-height:1; color:var(--gc); font-variant-numeric:tabular-nums}
+.gcard h3{font-size:1.3rem}
+.gcard .people{font-size:.92rem; color:var(--muted)}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{font-size:.8rem; border:1px solid var(--line); border-radius:999px; padding:2px 9px; color:var(--muted)}
+.gcard .go{font-weight:700; color:var(--gc); margin-top:4px}
+.note{margin-top:28px; color:var(--muted); font-size:.95rem; max-width:70ch}
+
+/* Group intro */
+.intro{display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:28px; align-items:start}
+.intro h2{font-size:clamp(1.9rem, 4.6vw, 3rem); font-weight:800; letter-spacing:-.02em}
+.intro .lede{margin:14px 0 20px}
+.steps{display:grid; gap:10px; margin:0 0 24px; padding:0; list-style:none; counter-reset:s}
+.steps li{display:flex; gap:12px; align-items:baseline; counter-increment:s}
+.steps li::before{content:counter(s); font-family:var(--mono); font-size:.8rem; font-weight:600; color:var(--accent); border:1.5px solid var(--accent); border-radius:50%; width:24px; height:24px; display:inline-grid; place-items:center; flex:0 0 auto}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:20px}
+.personas{display:grid; gap:14px}
+.persona-head{display:flex; gap:14px; align-items:center}
+.persona-av{width:48px; height:48px; border-radius:50%; background:var(--accent-soft); color:var(--accent); display:grid; place-items:center; font-family:var(--display); font-weight:800; font-size:1.1rem; flex:0 0 auto}
+.persona-head h3{font-size:1.1rem}
+.persona-head p{margin:0; color:var(--muted); font-size:.93rem}
+.btn{border:0; border-radius:10px; padding:12px 18px; font-weight:700; background:var(--accent); color:var(--accent-ink); text-decoration:none; display:inline-block}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent; color:var(--ink); border:1.5px solid var(--line)}
+.btn.scam{background:var(--flag); color:#fff}
+.btn.safe{background:var(--ok); color:#fff}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn.scam, :root:not([data-theme="light"]) .btn.safe{color:#10181d}}
+:root[data-theme="dark"] .btn.scam, :root[data-theme="dark"] .btn.safe{color:#10181d}
+
+/* Play */
+.play{display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:24px; align-items:start}
+.stage-meta{display:flex; gap:10px; align-items:baseline; margin-bottom:10px; flex-wrap:wrap}
+.clock{font-family:var(--display); font-weight:800; font-size:2rem; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+.place{color:var(--muted)}
+.who{font-size:.8rem; font-weight:700; background:var(--accent-soft); color:var(--accent); border-radius:999px; padding:2px 10px}
+.panel.card.good{border-color:var(--ok)}
+.panel{position:sticky; top:calc(env(safe-area-inset-top, 0px) + 12px); display:grid; gap:14px}
+.context{font-size:1.05rem; margin:0}
+.hint{color:var(--muted); font-size:.95rem; margin:0}
+.marked-count{font-family:var(--mono); font-size:.82rem; color:var(--mark)}
+.actions{display:flex; gap:10px; flex-wrap:wrap}
+.actions .btn{flex:1 1 140px; text-align:center}
+.verdict{display:flex; gap:10px; align-items:center; font-family:var(--display); font-weight:800; font-size:1.3rem}
+.verdict .dot{width:12px; height:12px; border-radius:50%; flex:0 0 auto}
+.verdict.right .dot{background:var(--ok)} .verdict.wrong .dot{background:var(--flag)}
+.goodjob{background:var(--ok-soft); border:2px solid var(--ok); border-radius:10px; padding:12px 14px; display:grid; gap:4px}
+.goodjob .verdict{color:var(--ok)}
+.gj-badge{justify-self:start; background:var(--ok); color:var(--surface); font-weight:800; font-size:.85rem; padding:3px 10px; border-radius:999px}
+.gj-note{margin:2px 0 0; font-size:.92rem; color:var(--ink)}
+.scamname{font-family:var(--mono); font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted)}
+.flaglist{list-style:none; margin:0; padding:0; display:grid; gap:10px}
+.flaglist li{display:grid; grid-template-columns:26px minmax(0,1fr); gap:10px; align-items:start}
+.num{font-family:var(--mono); font-size:.75rem; font-weight:600; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; background:var(--flag); color:#fff}
+.num.ok{background:var(--ok)}
+.flaglist b{display:block}
+.flaglist .st{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; margin-left:6px}
+.st.found{color:var(--ok)} .st.missed{color:var(--flag)}
+.flaglist p{margin:2px 0 0; color:var(--muted); font-size:.95rem}
+.lesson{background:var(--accent-soft); border-radius:10px; padding:12px 14px}
+.lesson b{font-family:var(--mono); font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); display:block; margin-bottom:2px}
+.falsenote{font-size:.9rem; color:var(--muted); margin:0}
+
+/* Hotspots */
+.hot{cursor:pointer; border-radius:4px; transition:background .15s, box-shadow .15s; position:relative}
+.spot .hot:hover{background:var(--mark-soft)}
+.hot.marked{background:var(--mark-soft); box-shadow:0 0 0 2px var(--mark)}
+.spot .hot.btnlink:hover, .hot.btnlink.marked{background:var(--accent); color:var(--accent-ink)}
+.spot .hot.ghostlink:hover, .hot.ghostlink.marked{background:transparent; color:var(--ink)}
+.reveal .hot{cursor:default}
+.reveal .hot.marked{background:transparent; box-shadow:none}
+.reveal .hot.is-flag{box-shadow:0 0 0 2px var(--ok); background:var(--ok-soft)}
+.reveal .hot.is-flag[data-n]::after{background:var(--ok)}
+.reveal .hot.is-flag.missed{font-weight:800; background:var(--flag-soft); box-shadow:0 0 0 3px var(--flag); outline:3px dashed var(--flag); outline-offset:4px; animation:pulse 1.4s ease-in-out 3}
+.reveal .hot.is-flag.missed[data-n]::after{background:var(--flag); width:22px; height:22px; line-height:22px; font-size:12px; top:-13px; right:-13px}
+.reveal .hot.is-flag.missed::before{content:"MISSED"; position:absolute; left:-4px; top:-22px; background:var(--flag); color:#fff; font:700 10px/1 var(--mono); letter-spacing:.08em; padding:3px 5px; border-radius:3px; z-index:3; white-space:nowrap}
+@keyframes pulse{50%{outline-offset:8px}}
+.legend{display:flex; flex-wrap:wrap; gap:6px 16px; font-size:.85rem; color:var(--muted); margin:14px 0 0}
+.legend span{display:inline-flex; align-items:center; gap:6px}
+.legend i{width:14px; height:14px; border-radius:3px; display:inline-block}
+.legend .lg-miss{background:var(--flag-soft); box-shadow:0 0 0 2px var(--flag)}
+.legend .lg-got{background:var(--ok-soft); box-shadow:0 0 0 2px var(--ok)}
+.legend .lg-false{background:var(--surface-2); box-shadow:0 0 0 1px var(--line)}
+.flaglist li.missed-row{background:var(--flag-soft); border-radius:8px; padding:8px; margin:-4px -8px; box-shadow:inset 3px 0 0 var(--flag)}
+.flaglist li.missed-row b{color:var(--flag)}
+.flaglist li.missed-row p{color:var(--ink)}
+.num.got{background:var(--ok)}
+.st.missed{font-weight:800; font-size:.78rem}
+.missbox{background:var(--flag-soft); border-radius:10px; padding:10px 14px; font-weight:700; color:var(--flag)}
+/* Report + results log */
+.namefield{display:grid; gap:4px; margin:0 0 18px; max-width:340px; font-size:.9rem; color:var(--muted)}
+.namefield input, .toolbar select{font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:9px 12px}
+.report-table{width:100%; border-collapse:collapse; font-size:.92rem}
+.report-table th{text-align:left; font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--line); white-space:nowrap}
+.report-table td{padding:10px; border-bottom:1px solid var(--line); vertical-align:top}
+.report-table td.num-c{font-variant-numeric:tabular-nums; white-space:nowrap}
+.report-table .miss{color:var(--flag); font-weight:700}
+.report-table .good{color:var(--ok); font-weight:700}
+.report-table tr.click{cursor:pointer} .report-table tr.click:hover td{background:var(--surface-2)}
+.tablewrap{overflow-x:auto}
+.toolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between}
+.savenote{font-size:.88rem; color:var(--muted); margin:0}
+.savenote.ok{color:var(--ok)} .savenote.bad{color:var(--flag)}
+.tiles{display:flex; flex-wrap:wrap; gap:22px}
+.tiles div{font-size:.9rem; color:var(--muted)}
+.tiles b{display:block; font-family:var(--display); font-size:1.6rem; color:var(--ink); font-variant-numeric:tabular-nums}
+.detail td{background:var(--surface-2)}
+.detail ul{margin:6px 0 0; padding-left:18px}
+.resultsLink{font-size:.92rem; font-weight:600; text-decoration:none}
+#hoverTip{position:fixed; z-index:50; pointer-events:none; background:var(--ink); color:var(--bg); font:600 .8rem/1.2 var(--body); padding:7px 10px; border-radius:6px; white-space:nowrap; box-shadow:0 6px 18px -6px rgba(0,0,0,.45); opacity:0; transform:translateY(4px); transition:opacity .12s}
+#hoverTip.show{opacity:1; transform:none}
+@media (hover:none){ #hoverTip{display:none} }
+.fields{display:flex; flex-wrap:wrap; gap:0 14px}
+.practice{margin-top:24px; display:grid; gap:12px}
+button.tchip{font:inherit; font-family:var(--mono); font-size:.78rem; cursor:pointer}
+.tchip.reviewable:hover{border-color:var(--accent); color:var(--accent)}
+.tchip.viewing{background:var(--accent-soft); border-color:var(--accent); color:var(--accent); box-shadow:0 0 0 2px var(--accent)}
+.tchip .tmark{color:var(--flag); font-weight:800}
+.reviewbar{background:var(--accent-soft); color:var(--accent); border-radius:8px; padding:8px 12px; font-weight:700; font-size:.9rem}
+.practice-grid{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:20px; align-items:start}
+@media (max-width:860px){ .practice-grid{grid-template-columns:minmax(0,1fr)} }
+.fields .namefield{flex:1 1 200px}
+.namefield input[readonly]{background:var(--surface-2)}
+.welcome{display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:8px; border-color:var(--accent)}
+.reveal .hot.is-ok{box-shadow:0 0 0 2px var(--ok); background:var(--ok-soft)}
+.reveal .hot.is-false{text-decoration:line-through; text-decoration-color:var(--muted); background:var(--surface-2)}
+.reveal .hot[data-n]::after{content:attr(data-n); position:absolute; top:-10px; right:-10px; width:18px; height:18px; border-radius:50%; background:var(--flag); color:#fff; font:600 11px/18px var(--mono); text-align:center; z-index:2}
+.reveal .hot.is-ok[data-n]::after{background:var(--ok)}
+.reveal .hot.btnlink.is-flag, .reveal .hot.btnlink.is-ok, .reveal .hot.btnlink.is-false{color:var(--ink)}
+.reveal .banner[data-n]::after{top:8px; right:10px}
+.reveal .banner.is-flag.missed::before{top:8px; left:auto; right:38px}
+.alarm .hot.is-flag, .post-card .hot.is-flag{background:transparent; box-shadow:0 0 0 2px #fff}
+.alarm .hot.is-flag.missed{outline-color:#fff}
+
+/* Mock: phone */
+.phone{max-width:360px; margin:0 auto; background:var(--surface); border:10px solid var(--ink); border-radius:34px; overflow:hidden; box-shadow:0 18px 40px -20px rgba(10,20,30,.45)}
+.phone-bar{display:flex; justify-content:space-between; padding:8px 18px 4px; font:600 .78rem var(--mono); color:var(--ink)}
+.sms-head{display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 14px 12px; border-bottom:1px solid var(--line); text-align:center}
+.avatar{width:44px; height:44px; border-radius:50%; background:var(--bubble); display:grid; place-items:center; font-weight:700; color:var(--muted); flex:0 0 auto; font-size:.85rem}
+.sms-name{font-weight:700; font-size:.95rem}
+.sms-sub{font-size:.75rem; color:var(--muted)}
+.call-head{padding:22px 14px 16px; text-align:center; display:grid; gap:6px; justify-items:center; border-bottom:1px solid var(--line)}
+.call-head .avatar{width:64px; height:64px; font-size:1.2rem}
+.call-btns{display:flex; justify-content:center; gap:40px; padding:4px 0 18px}
+.call-btns i{width:46px; height:46px; border-radius:50%; display:block}
+.call-btns i:first-child{background:var(--flag)} .call-btns i:last-child{background:var(--ok)}
+.sms-body{padding:16px 14px 22px; display:grid; gap:8px; min-height:240px; align-content:start}
+.bubble{background:var(--bubble); border-radius:18px 18px 18px 6px; padding:10px 13px; max-width:88%; font-size:.95rem; overflow-wrap:anywhere}
+.bubble.me{justify-self:end; background:var(--accent-soft); border-radius:18px 18px 6px 18px}
+.spk{display:block; font-size:.72rem; font-family:var(--mono); color:var(--muted); text-transform:uppercase; letter-spacing:.05em}
+.url{font-family:var(--mono); font-size:.85em; color:var(--accent); text-decoration:underline; overflow-wrap:anywhere}
+
+/* Mock: windows */
+.win{background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:0 18px 40px -24px rgba(10,20,30,.45)}
+.win-bar{display:flex; align-items:center; gap:8px; padding:9px 12px; background:var(--surface-2); border-bottom:1px solid var(--line); font-size:.82rem; color:var(--muted); min-width:0}
+.lights{display:flex; gap:5px; flex:0 0 auto} .lights i{width:10px; height:10px; border-radius:50%; background:var(--line); display:block}
+.addr{flex:1; min-width:0; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:4px 12px; font-family:var(--mono); font-size:.8rem; color:var(--ink); overflow-wrap:anywhere}
+.banner{display:block; background:var(--mark-soft); color:var(--ink); padding:8px 16px; font-size:.85rem; border-bottom:1px solid var(--line)}
+.mail-head{padding:14px 18px; border-bottom:1px solid var(--line); display:grid; gap:4px; font-size:.92rem; overflow-wrap:anywhere}
+.mail-head .subj{font-family:var(--display); font-weight:700; font-size:1.2rem; margin-bottom:4px}
+.mail-head .lbl{color:var(--muted); display:inline-block; width:44px}
+.mail-body{padding:18px; font-size:.97rem; overflow-wrap:anywhere}
+.btnlink{display:inline-block; background:var(--accent); color:var(--accent-ink); padding:8px 16px; border-radius:6px; font-weight:700}
+.ghostlink{background:transparent; color:var(--ink); border:1.5px solid var(--line)}
+.hoverurl{display:block; margin-top:8px; font-size:.8rem; color:var(--muted)}
+.chat-head{display:flex; gap:10px; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line); font-size:.92rem; flex-wrap:wrap}
+.ext{font-family:var(--mono); font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; background:var(--mark-soft); color:var(--ink); padding:1px 6px; border-radius:4px}
+.ext.ok{background:var(--ok-soft); color:var(--ok)}
+.chat-body{padding:16px; display:grid; gap:12px; min-height:240px; align-content:start}
+.msg{display:grid; grid-template-columns:34px minmax(0,1fr); gap:10px}
+.msg .avatar{width:34px; height:34px; font-size:.75rem}
+.msg .whoname{font-size:.8rem; color:var(--muted); font-weight:700}
+.msg.me .avatar{background:var(--accent-soft); color:var(--accent)}
+.page{padding:20px; min-height:260px; display:grid; gap:10px; align-content:start}
+.page p{margin:0}
+.shop-brand{font-family:var(--display); font-weight:800; letter-spacing:.08em; text-transform:uppercase; font-size:.9rem; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:10px}
+.shop-brand span{color:var(--muted); letter-spacing:.04em; font-weight:600}
+.product{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:18px}
+.boot{aspect-ratio:1; max-width:100%; border-radius:10px; background:var(--surface-2); display:grid; place-items:center}
+.boot svg{width:70%; height:auto}
+.product h3{font-size:1.15rem}
+.price{font-family:var(--display); font-weight:800; font-size:1.5rem; color:var(--flag)}
+.price s{font-size:.95rem; color:var(--muted); font-weight:500}
+.product .stack{display:grid; gap:8px; align-content:start; font-size:.92rem}
+.timer{font-family:var(--mono); font-size:.85rem; color:var(--flag)}
+.alarm{background:var(--alarm); color:var(--alarm-ink); padding:28px 22px; text-align:center; display:grid; gap:12px; min-height:280px; align-content:center}
+.alarm.prize{background:linear-gradient(135deg, #d4247a, #f0a020)}
+.alarm h3{font-size:1.5rem; color:inherit}
+.alarm .shield{font-size:2.4rem; line-height:1}
+.alarm .call{font-family:var(--mono); font-weight:600; background:#fff; color:#b3261e; padding:8px 12px; border-radius:6px; justify-self:center}
+.alarm .hot:hover, .post-card .hot:hover{background:rgba(255,255,255,.2)}
+.kidcard{padding:24px 20px; text-align:center; display:grid; gap:10px; justify-items:center}
+.kidcard p{margin:0}
+.big-emoji{font-size:2.6rem; line-height:1}
+.gatebox{display:inline-block; border:1.5px dashed var(--line); border-radius:8px; padding:8px 12px; font-family:var(--mono); font-size:.85rem}
+.appstore{display:flex; gap:14px; align-items:center}
+.appicon{width:64px; height:64px; border-radius:16px; background:var(--c-kids); color:#fff; display:grid; place-items:center; font-family:var(--display); font-weight:800; font-size:1.3rem; flex:0 0 auto}
+.req{display:flex; gap:12px; align-items:flex-start}
+.req > div:last-child{display:grid; gap:4px; min-width:0}
+.okbadge{color:var(--ok); font-weight:700; font-size:.9rem}
+.genpage{display:grid; gap:10px}
+.genpage label{display:grid; gap:4px; font-size:.85rem; color:var(--muted)}
+.fakeinput{border:1px solid var(--line); border-radius:6px; padding:7px 10px; font-family:var(--mono); color:var(--ink); background:var(--surface-2)}
+.comments{display:grid; gap:8px; font-size:.92rem}
+.comments > div{background:var(--surface-2); padding:8px 12px; border-radius:10px}
+.post{padding:16px; display:grid; gap:12px}
+.post-head{display:flex; gap:10px; align-items:center; font-size:.9rem}
+.post-card{border-radius:10px; padding:26px 18px; text-align:center; background:linear-gradient(135deg, #7b3fa0, #d9488b); color:#fff; font-family:var(--display); font-weight:800; font-size:1.2rem; line-height:1.4}
+.meta{font-size:.82rem; color:var(--muted)}
+
+/* Summary */
+.summary{display:grid; gap:22px}
+.sum-hero{display:grid; grid-template-columns:auto minmax(0,1fr); gap:24px; align-items:center}
+.big{font-family:var(--display); font-weight:800; font-size:clamp(3rem, 9vw, 5.5rem); line-height:1; color:var(--accent); font-variant-numeric:tabular-nums}
+.big small{font-size:.35em; color:var(--muted)}
+.stats{display:flex; gap:22px; flex-wrap:wrap; margin-top:8px}
+.stats div{font-size:.9rem; color:var(--muted)}
+.stats b{display:block; font-family:var(--display); font-size:1.5rem; color:var(--ink); font-variant-numeric:tabular-nums}
+.grid2{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px}
+.bars{display:grid; gap:12px}
+.bar-row{display:grid; gap:4px; font-size:.92rem}
+.bar-row .track{height:8px; border-radius:4px; background:var(--surface-2); overflow:hidden}
+.bar-row .fill{height:100%; background:var(--ok); border-radius:4px}
+.bar-row.weak .fill{background:var(--flag)}
+.bar-row .lbl{display:flex; justify-content:space-between; gap:8px}
+.bar-row .lbl span{font-family:var(--mono); font-size:.8rem; color:var(--muted); font-variant-numeric:tabular-nums}
+.cheat{list-style:none; margin:0; padding:0; display:grid; gap:10px}
+.cheat li b{display:block}
+.cheat li span{color:var(--muted); font-size:.93rem}
+.card h3{font-size:1.1rem; margin-bottom:12px}
+
+@media (max-width:860px){
+  .play, .intro, .grid2{grid-template-columns:minmax(0,1fr)}
+  .panel{position:static}
+  .product{grid-template-columns:minmax(0,1fr)}
+  .boot{max-width:200px}
+  .sum-hero{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important} }
+
+
+/* ---- Stronger calls to action ---- */
+.btn{padding:14px 22px; font-size:1rem}
+.actions .btn{min-height:52px}
+.panel .actions .btn{font-size:1.05rem; min-height:60px}
+.panel > .btn{width:100%; min-height:56px; font-size:1.05rem}
+.gcard{display:flex; flex-direction:column}
+.gcard .go{margin-top:auto; display:block; text-align:center; background:var(--gc); color:var(--surface); padding:13px 16px; border-radius:8px; font-weight:800; font-size:1rem}
+.gcard:hover .go{filter:brightness(1.08)}
+.intro .btn[data-act="start"]{font-size:1.15rem; padding:17px 32px; animation:nudge 2.6s ease-in-out 1.5s infinite}
+@keyframes nudge{0%,100%{transform:none}50%{transform:translateY(-3px)}}
+
+/* ---- Bold how-it-works steps ---- */
+.hero{max-width:none}
+.hero h2, .hero .lede{max-width:780px}
+.how{display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:12px; counter-reset:how; margin-top:8px}
+.how li{counter-increment:how; display:flex; gap:12px; align-items:center; background:var(--surface); border:2px solid var(--accent); border-radius:12px; padding:14px 16px; font-size:1.05rem; font-weight:600; color:var(--ink); line-height:1.3}
+.how li::before{content:counter(how); flex:0 0 auto; width:36px; height:36px; border-radius:50%; background:var(--accent); color:var(--accent-ink); display:grid; place-items:center; font:800 1.05rem var(--display)}
+.how b{font-weight:800; color:var(--accent); font-size:1.15rem}
+</style>
+</head>
+<body>
+
+
+<div class="wrap" id="wrap">
+  <header class="top">
+    <a class="brand" href="#"><div class="brand-mark" aria-hidden="true"></div><h1>A Day Online</h1></a>
+    <div class="topright"><a class="resultsLink" id="rosterLink" href="#roster" hidden>Roster</a><a class="resultsLink" id="resultsLink" href="#results" hidden>Results log</a><a class="back" id="backLink" href="#" hidden>← All departments</a><div class="score-pill" id="scorePill" hidden>Score 0</div></div>
+  </header>
+  <nav class="timeline" id="timeline" aria-label="Your day"></nav>
+  <main id="app"></main>
+</div>
+
+<script>
+/* ---------- Mock-screen helpers ---------- */
+const H = (id, html, cls='') => `<span class="hot ${cls}" data-f="${id}" tabindex="0" role="button" aria-pressed="false">${html}</span>`;
+const bar = tm => `<div class="phone-bar"><span>${tm.replace(/ (AM|PM)/,'')}</span><span>5G ▮▮▮</span></div>`;
+const P = (tm, av, name, sub, msgs) => `<div class="phone">${bar(tm)}
+  <div class="sms-head"><div class="avatar">${av}</div><div class="sms-name">${name}</div><div class="sms-sub">${sub}</div></div>
+  <div class="sms-body">${msgs.map(m=>`<div class="bubble">${m}</div>`).join('')}</div></div>`;
+const CALL = (tm, name, sub, lines) => `<div class="phone">${bar(tm)}
+  <div class="call-head"><div class="avatar">☎</div><div class="sms-name">${name}</div><div class="sms-sub">${sub}</div></div>
+  <div class="sms-body">${lines.map(([w,x])=>`<div class="bubble ${w==='You'?'me':''}"><span class="spk">${w}</span>${x}</div>`).join('')}</div>
+  <div class="call-btns" aria-hidden="true"><i></i><i></i></div></div>`;
+const WIN = (barHtml, inner) => `<div class="win"><div class="win-bar"><div class="lights"><i></i><i></i><i></i></div>${barHtml}</div>${inner}</div>`;
+const MAIL = (app, {banner='', subj, from, to, body}) => WIN(`<span>${app}</span>`, `${banner}<div class="mail-head"><div class="subj">${subj}</div>
+  <div><span class="lbl">From</span>${from}</div><div><span class="lbl">To</span>${to}</div></div><div class="mail-body">${body}</div>`);
+const CHAT = (app, head, av, msgs) => WIN(`<span>${app}</span>`, `<div class="chat-head"><div class="avatar">${av}</div><div>${head}</div></div>
+  <div class="chat-body">${msgs.map(([w,x])=>`<div class="msg ${w==='You'?'me':''}"><div class="avatar">${w==='You'?'Me':av}</div><div><div class="whoname">${w}</div>${x}</div></div>`).join('')}</div>`);
+const WEB = (url, page) => WIN(`<div class="addr">${url}</div>`, `<div class="page">${page}</div>`);
+const APP = (app, inner) => WIN(`<span>${app}</span>`, `<div class="page">${inner}</div>`);
+const BOOT = `<svg viewBox="0 0 120 100" aria-hidden="true"><path d="M30 10h34l4 40 34 14c8 4 10 10 10 18v6H18l-2-10 8-6z" fill="#8a5a32"/><path d="M16 88h96v8H16z" fill="#2b2b2b"/><path d="M34 22h28M34 32h30M34 42h32" stroke="#e7c9a2" stroke-width="3"/></svg>`;
+
+const CATS = {
+  urgency: ['Pressure to act fast', 'Real organizations give you time. A countdown, threat or alarm is your cue to slow down.'],
+  sender:  ["Sender doesn't check out", 'Look at the real address, number or profile, not the display name. Strangers and lookalikes are warning signs.'],
+  link:    ["Web address doesn't match", 'Read the domain just before the first single slash. Lookalikes add words or misspell the real name.'],
+  payment: ['Strange way to pay', 'Gift cards, Zelle, Cash App, crypto, cash couriers or a tiny "fee" are how scammers get paid.'],
+  data:    ['Asks for codes, ID, photos or personal details', 'Never share sign-in codes, passwords, ID, photos or account numbers with someone who contacted you.'],
+  contact: ['Wants you to call or message them', 'Contact companies using details you find yourself: the back of your card, the official website or app.'],
+  toogood: ['Too good to be true', 'Huge discounts, easy money, surprise prizes and instant romance are bait.'],
+  secrecy: ['Secrecy or switching apps', '"Keep this between us" or "message me on another app" means they want to avoid anyone checking.'],
+};
+const KID_CATS = {
+  urgency: ['Hurry-up tricks', 'If something says "hurry!", stop and ask a grown-up.'],
+  sender:  ['Strangers and pretenders', 'People online can pretend to be anyone, even a kid or the game.'],
+  link:    ['Weird links and websites', 'Only get games and updates from the app store, with a grown-up.'],
+  data:    ['Asking for passwords, photos or where you live', 'Your password, photos, school and address are private. Keep them that way.'],
+  toogood: ['Free stuff that seems too good', 'Free coins, skins and prizes from strangers are tricks.'],
+  secrecy: ['Secrets from your grown-ups', 'A safe friend never asks you to keep secrets. Always tell.'],
+  payment: ['Asking for money', 'Only grown-ups decide about buying things.'],
+  contact: ['Asking you to call', 'Ask a grown-up before contacting anyone.'],
+};
+
+/* ---------- Department scenarios (corp) ----------
+   GENERAL scenes are shared by every department; who:'f'|'m' picks that department's person.
+   screen(t, p) and ctx(p) receive the person: {name, first, last, role, email}. */
+const GROUPS = {};
+const CO = 'Halvern Industries', DOM = 'halvern.com';
+const WORKDAY = ['8:05 AM','8:40 AM','9:25 AM','10:10 AM','11:00 AM','12:15 PM','1:30 PM','2:45 PM','3:50 PM','5:05 PM'];
+const person = (first, last, role, blurb) => ({ name:first, first, last, role, blurb, email:`${first.toLowerCase()}.${last.toLowerCase()}@${DOM}` });
+const EXT = H('f1',`[EXTERNAL] This message came from outside ${CO}. Be careful with links.`,'banner');
+const box = (title, inner) => APP(title, `<div class="kidcard">${inner}</div>`);
+
+const GENERAL = [
+  { who:'m', v:'scam', name:'Password phishing email', place:'Work laptop · Outlook',
+    ctx: p => `First thing in the morning. ${CO} email addresses end in @${DOM}.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:H('n1',`Mailbox password expires today`), from:`IT Service Desk ${H('f2',`&lt;servicedesk@halvern-it-support.com&gt;`)}`, to:p.email,
+      body:`${H('f3',`Dear User,`)}<br><br>Your mailbox password ${H('f4',`expires in 2 hours`)}. To keep your current password, verify your account below.<br><br>${H('n2',`Keep My Password`,'btnlink')}<span class="hoverurl">Hover preview: ${H('f5',`https://halvern-login.microsft-verify.com/auth`,'url')}</span>`}),
+    f:[['f1','sender',`External sender warning`,`Your IT team emails from inside the company.`],
+       ['f2','sender',`Not ${DOM}`,`"halvern-it-support.com" is a different domain anyone could buy.`],
+       ['f3','sender',`"Dear User"`,`IT knows your name. A generic greeting means a mass mailing.`],
+       ['f4','urgency',`Expires in 2 hours`,`Fear of losing email access is meant to rush you.`],
+       ['f5','link',`Misspelled link`,`"microsft-verify.com" is a fake sign-in page that steals passwords.`]],
+    do:`Report it with the phishing button. Change passwords only in your normal company sign-in, which you open yourself.` },
+  { who:'f', v:'safe', name:'Real IT maintenance notice', place:'Work laptop · Outlook',
+    ctx: p => `An all-staff email arrives from IT.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:'Planned maintenance Saturday night', from:H('f1',`${CO} IT &lt;it@${DOM}&gt;`), to:'All staff',
+      body:`Hi everyone,<br><br>${H('f2',`The VPN will be unavailable Saturday from 10 PM to 2 AM for planned maintenance.`)}<br><br>${H('f3',`No action needed.`)} ${H('n1',`Questions: ext. 4400 or the IT portal.`)}`}),
+    f:[['f1','ok',`From inside the company`,`@${DOM} and no External banner.`],['f2','ok',`Information only`,`It tells you something. It doesn't ask for anything.`],['f3','ok',`No action needed`,`No link, no password, no deadline.`]],
+    do:`Real. Nothing to do.` },
+  { who:'f', v:'scam', name:'Shared-file phishing', place:'Work laptop · Outlook',
+    ctx: p => `An email says a file has been shared with ${p.first}.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Q4 Bonus Structure.pdf was shared with you`, from:`HR Documents ${H('f2',`&lt;share@docs-halvern-portal.com&gt;`)}`, to:p.email,
+      body:`${H('f3',`Please review the confidential Q4 bonus structure before Friday.`)}<br><br>${H('n1',`Open document`,'btnlink')}<span class="hoverurl">Hover preview: ${H('f4',`https://docs-halvern-portal.com/login?file=q4bonus`,'url')}</span>`}),
+    f:[['f1','sender',`External warning`,`HR shares files from inside the company.`],['f2','sender',`Not ${DOM}`,`"docs-halvern-portal.com" is a lookalike.`],
+       ['f3','toogood',`A juicy topic`,`Bonus info is bait people can't resist opening.`],['f4','link',`A login page`,`It asks you to sign in on a fake page to "see" the file.`]],
+    do:`Don't open it. Report it, and find real HR documents on the intranet yourself.` },
+  { who:'m', v:'safe', name:'Real shared file', place:'Work laptop · Outlook',
+    ctx: p => `${p.first} asked a teammate, Sam Patel, for the updated schedule this morning.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`Schedule v3 was shared with you`, from:H('f1',`Sam Patel &lt;sam.patel@${DOM}&gt;`), to:p.email,
+      body:`${H('f2',`Here's the updated schedule you asked for.`)}<br><br>${H('f3',`It's in our team folder.`)} ${H('n1',`Let me know if anything's off.`)}`}),
+    f:[['f1','ok',`A coworker on ${DOM}`,`No External banner.`],['f2','ok',`Something you asked for`,`You requested it this morning.`],['f3','ok',`In a folder you know`,`No strange login page.`]],
+    do:`Real. Open it from the team folder as usual.` },
+  { who:'m', v:'scam', name:'Sign-in approval flood', place:'Phone · Authenticator app',
+    ctx: p => `${p.first} is at home on the couch, not signing in to anything.`,
+    screen: (t,p) => P(t, 'AU', H('n1',`Authenticator`), 'App notifications', [
+      H('f1',`Approve sign-in? Work account · Location: Unknown`), H('f2',`Approve sign-in? (3rd request in 2 minutes)`),
+      `<b>Text from +1 (213) 555-0150:</b> ${H('f3',`This is IT. Please tap Approve so the alerts stop.`)}`]),
+    f:[['f1','sender',`A sign-in you didn't start`,`Someone has your password and is trying to get in.`],['f2','urgency',`Request after request`,`They hope you'll tap Approve just to make it stop.`],
+       ['f3','contact',`"IT" asking you to approve`,`Real IT never asks you to approve a sign-in you didn't make.`]],
+    do:`Tap Deny every time, report it to the IT help desk, and change your password.` },
+  { who:'f', v:'safe', name:'Real sign-in approval', place:'Work laptop + phone',
+    ctx: p => `${p.first} just typed her password into the company sign-in page.`,
+    screen: (t,p) => P(t, 'AU', H('f1',`Authenticator`), 'App notification', [H('f2',`Approve sign-in? Work account · Chrome on Windows · Your location`), H('f3',`Enter the number shown on your screen: 47`)]),
+    f:[['f1','ok',`Your authenticator app`,`The app your company set up.`],['f2','ok',`Matches what you just did`,`Your laptop, your browser, right now.`],['f3','ok',`Number matching`,`Only someone looking at your screen can approve.`]],
+    do:`Real. Approve only sign-ins you just started yourself.` },
+  { who:'f', v:'scam', name:'Fake direct deposit change', place:'Work laptop · Outlook',
+    ctx: p => `Payday is Friday.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`ACTION REQUIRED: Confirm payroll details before Friday`, from:`Payroll Team ${H('f2',`&lt;payroll@halvern-hr-services.com&gt;`)}`, to:p.email,
+      body:`${H('f3',`We're moving to a new payroll system. Confirm your bank details or your paycheck may be delayed.`)}<br><br>${H('f4',`Confirm details`,'btnlink')} ${H('n1',`Takes 2 minutes`)}`}),
+    f:[['f1','sender',`External warning`,`Payroll is internal.`],['f2','sender',`A lookalike HR domain`,`Not ${DOM}.`],
+       ['f3','urgency',`"Your paycheck may be delayed"`,`Fear about your pay makes you act fast.`],['f4','link',`Enter bank details on a link`,`Your next paycheck would go to the scammer.`]],
+    do:`Don't click. Update pay details only in the HR system you normally use, and report the email.` },
+  { who:'m', v:'safe', name:'Real HR enrollment reminder', place:'Work laptop · Outlook',
+    ctx: p => `Benefits open enrollment runs through November 30.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`Open enrollment closes November 30`, from:H('f1',`${CO} HR &lt;benefits@${DOM}&gt;`), to:'All staff',
+      body:`${H('f2',`Reminder: choose your 2027 benefits by November 30.`)}<br><br>${H('f3',`Make your choices in Workday from the intranet home page.`)} ${H('n1',`HR office hours: Tue/Thu 2–4 PM.`)}`}),
+    f:[['f1','ok',`Internal HR address`,`No External banner.`],['f2','ok',`A known deadline`,`Weeks away, announced before.`],['f3','ok',`Go there yourself`,`No link to type details into.`]],
+    do:`Real. Enroll through the HR system you already use.` },
+  { who:'m', v:'scam', name:'Bank impersonation text', place:'Personal phone · texts',
+    ctx: p => `${p.first} banks with Coastline Bank. His phone buzzes during a meeting.`,
+    screen: (t,p) => P(t, '#', H('n1',`+1 (305) 555-0128`), 'Text message', [
+      `Coastline Bank: ${H('f2',`Suspicious sign-in on your account from Lagos, Nigeria.`)} If this was NOT you, ${H('f1',`call our Fraud Team now at 1-877-555-0119`)}.`,
+      H('f3',`A specialist will text you a code. Read it back to them to secure your account.`)]),
+    f:[['f1','contact',`A number given in the text`,`Call the number on the back of your card instead.`],['f2','urgency',`Scary, specific alert`,`Meant to make you call without thinking.`],
+       ['f3','data',`Read back a code`,`That code signs someone into your account.`]],
+    do:`Call the number on your card or open your banking app yourself. Never read a code to anyone.` },
+  { who:'f', v:'safe', name:'Real sign-in code', place:'Personal phone · texts',
+    ctx: p => `${p.first} just tapped Sign in on her Coastline Bank app.`,
+    screen: (t,p) => P(t, 'CB', H('f1',`72641`), 'Text message', [`Coastline Bank: ${H('f2',`Your sign-in code is 481 927.`)} ${H('f3',`It expires in 10 minutes.`)} Coastline will never ask for this code.`]),
+    f:[['f1','ok',`Short code sender`,`And it arrived right as you signed in.`],['f2','ok',`A code you asked for`,`Type it into the app only.`],['f3','ok',`Short expiry`,`A security feature for a sign-in you started.`]],
+    do:`Real. If a code arrives when you didn't sign in, change your password.` },
+  { who:'f', v:'scam', name:'Fake delivery text', place:'Personal phone · texts',
+    ctx: p => `${p.first} ordered a few things online this week.`,
+    screen: (t,p) => P(t, '#', H('f1',`+1 (213) 555-0187`), 'Text message', [`${H('n1',`ParcelPoint:`)} Your package is on hold. ${H('f2',`Update within 24 hrs`)}: ${H('f3',`parcelpoint-redelivery.co/t/48211`,'url')} ${H('f4',`Fee: $1.99`)}`]),
+    f:[['f1','sender',`A regular phone number`,`Carriers text from short codes with your real tracking number.`],['f2','urgency',`24-hour deadline`,`Rushing you.`],
+       ['f3','link',`Lookalike address`,`Not the carrier's site.`],['f4','payment',`A tiny fee`,`They want your card number.`]],
+    do:`Don't tap. Check tracking in the store or carrier app you used.` },
+  { who:'m', v:'safe', name:'Real delivery text', place:'Personal phone · texts',
+    ctx: p => `${p.first} ordered a desk chair Monday. The order email said tracking ends in 4471.`,
+    screen: (t,p) => P(t, 'PP', H('f1',`47201`), 'Text message', [`ParcelPoint: ${H('f2',`Your package (tracking ending 4471) arrives today by 8 PM.`)} ${H('f3',`Track it in the ParcelPoint app.`)}`]),
+    f:[['f1','ok',`A short code`,`Not a personal number.`],['f2','ok',`Matches your order`,`Same tracking number.`],['f3','ok',`No link, no fee`,`Points you to the app.`]],
+    do:`Real.` },
+];
+
+const DEPTS = {
+finance: { label:'Finance', tag:'FIN', color:'--c-adults',
+  topics:['Vendor bank changes','CEO wire requests','W-2 requests','Fake invoices','Bank callbacks'],
+  headline:'Money moves through Finance, so scammers aim here first.',
+  intro:'Rachel runs accounts payable and Omar is the controller. Watch for payment changes, urgent wires and requests for sensitive records.',
+  people:{ f:person('Rachel','Kim','AP Lead','Processes vendor payments and invoices'), m:person('Omar','Haddad','Controller','Approves wires and runs month-end close') },
+  scenes:[
+  { who:'m', v:'scam', name:'Vendor bank details change', place:'Work laptop · Outlook', ctx:`Omar approves payments to Freightline Supply, a vendor used for years.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Updated remittance details`, from:`Freightline Supply Accounts ${H('f2',`&lt;ar@freightline-supply.co&gt;`)}`, to:p.email,
+      body:`${H('f3',`We've moved banks. Please send this month's $38,420 payment to our new account below.`)}<br><br>${H('f4',`It's urgent, our old account closes Friday. Please don't call, our phones are being updated.`)}<br><br>${H('n1',`Linda, Accounts Receivable`)}`}),
+    f:[['f1','sender',`External warning`,`Freightline's real emails come from its known domain.`],['f2','sender',`A slightly different domain`,`".co" instead of ".com".`],
+       ['f3','payment',`New bank account by email`,`Business email compromise: the money goes to the scammer.`],['f4','secrecy',`Urgent, and don't call`,`Blocks the phone check that would catch it.`]],
+    do:`Call the vendor on the number already in your records before changing any payment details. Report it to IT.` },
+  { who:'f', v:'safe', name:'Real vendor invoice', place:'Work laptop · AP portal', ctx:`Rachel logs in to the company's payables portal, as she does every week.`,
+    screen: () => WEB(H('f1',`https://payables.${DOM}/invoices`,'url'), `<h3>Invoice FS-10294 · Freightline Supply</h3><p>${H('f2',`$38,420.00 · PO 55120 · Matches receiving report`)}</p><p>${H('f3',`Pay to: bank account on file (verified March 2024)`)}</p><p>${H('n1',`Approve`,'btnlink')}</p>`),
+    f:[['f1','ok',`Your company's own portal`,`You went there yourself.`],['f2','ok',`Matches the paperwork`,`PO and receiving report line up.`],['f3','ok',`Same verified account`,`No new payment details.`]],
+    do:`Real. Approve as usual.` },
+  { who:'m', v:'scam', name:'CEO urgent wire', place:'Work laptop · Outlook', ctx:`Omar gets an email that appears to be from the CEO, Mark Ellison.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Confidential: acquisition deposit`, from:`Mark Ellison ${H('f2',`&lt;mark.ellison.ceo@outlook.com&gt;`)}`, to:p.email,
+      body:`Omar,<br><br>${H('f3',`We're closing a confidential acquisition today. I need a $186,000 deposit wired to the escrow account below before 3 PM.`)}<br><br>${H('f4',`Don't discuss this with anyone until it's announced.`)} ${H('n1',`I'm in meetings, email only.`)}`}),
+    f:[['f1','sender',`External warning`,`The CEO's mail comes from inside.`],['f2','sender',`A personal Outlook address`,`Not the CEO's company account.`],
+       ['f3','urgency',`Big wire, same-day deadline`,`Pressure to skip normal approvals.`],['f4','secrecy',`Tell no one`,`Secrecy bypasses dual approval.`]],
+    do:`Follow the wire approval process every time. Verify with the CEO by phone or in person, using a number you already have.` },
+  { who:'f', v:'safe', name:'Real CFO request', place:'Work chat', ctx:`Month-end close is this week.`,
+    screen: () => CHAT('Company chat', H('f1',`<b>Dana Brooks</b> · CFO · ${CO}`), 'DB', [['Dana Brooks', H('f2',`Hi Rachel, can you add the October AP aging report to the close folder by Thursday?`)], ['Dana Brooks', H('f3',`No rush before then, thanks!`)]]),
+    f:[['f1','ok',`An internal account`,`No External tag.`],['f2','ok',`A normal close task`,`A report, not a payment.`],['f3','ok',`No pressure`,`A reasonable deadline.`]],
+    do:`Real. Normal requests sound like normal work.` },
+  { who:'m', v:'scam', name:'W-2 request from "the CEO"', place:'Work laptop · Outlook', ctx:`It's tax season prep time.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`Quick request`, from:H('f1',`Mark Ellison &lt;mark.ellison@halvern.co&gt;`), to:p.email,
+      body:`${H('f2',`Can you send me all employee W-2s for 2025 as one PDF?`)} ${H('f3',`I need them in the next hour for a review with the accountants.`)}<br><br>${H('n1',`Sent from my iPhone`)}`}),
+    f:[['f1','sender',`halvern.co, not ${DOM}`,`One letter off. No External banner because it was spoofed carefully.`],['f2','data',`Every employee's W-2`,`Names, addresses and Social Security numbers for everyone.`],
+       ['f3','urgency',`Within the hour`,`Rushing you past the privacy rules.`]],
+    do:`Never email W-2s or SSNs. Confirm any request like this in person, and report it to IT.` },
+  { who:'f', v:'safe', name:'Real auditor request', place:'Work laptop · audit portal', ctx:`The external auditors started fieldwork Monday under the signed engagement letter.`,
+    screen: () => WEB(H('f1',`https://audit-portal.${DOM}/requests`,'url'), `<h3>Request #27 · Brightwater &amp; Co. (external audit)</h3><p>${H('f2',`Please upload 5 sample invoices from Q3 (list attached in the portal).`)}</p><p>${H('f3',`Due: end of next week`)}</p>`),
+    f:[['f1','ok',`Your company's audit portal`,`Where the engagement already runs.`],['f2','ok',`A normal sample request`,`Specific, limited documents.`],['f3','ok',`Reasonable timing`,`No same-day panic.`]],
+    do:`Real. Upload through the portal, not by email.` },
+  { who:'f', v:'scam', name:'Overdue invoice threat', place:'Work laptop · Outlook', ctx:`Rachel doesn't recognize this supplier.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`FINAL NOTICE: Invoice 4471 overdue`, from:H('f2',`Accounts &lt;billing@nexgen-consult-group.net&gt;`), to:p.email,
+      body:`${H('f3',`Invoice 4471 for "consulting services" ($9,850) is 60 days overdue. It will be sent to collections tomorrow.`)}<br><br>${H('f4',`View invoice`,'btnlink')}`}),
+    f:[['f1','sender',`External warning`,`From outside the company.`],['f2','sender',`A supplier you don't know`,`No PO, no vendor record.`],
+       ['f3','urgency',`Collections threat`,`Fear to make you pay without checking.`],['f4','link',`"View invoice" link`,`Often malware or a fake login.`]],
+    do:`Check the vendor master file and PO system. No PO, no payment. Report it.` },
+  { who:'m', v:'safe', name:'Real bank callback', place:'Desk phone · call', ctx:`Omar submitted a $12,400 wire to Freightline in the banking portal 20 minutes ago.`,
+    screen: (t,p) => CALL(t, H('f1',`First Harbor Bank Treasury · number on file`), 'Incoming call', [['Bank', H('f2',`We're calling to confirm wire 0098 for $12,400 to Freightline Supply that you submitted at 10:02.`)], ['Bank', H('f3',`Please confirm it in your treasury portal. We won't ask for any codes on this call.`)]]),
+    f:[['f1','ok',`Your bank's known number`,`The callback number on file.`],['f2','ok',`Matches what you did`,`Your wire, your amount, your time.`],['f3','ok',`No codes or passwords`,`It sends you to the portal.`]],
+    do:`Real. Confirm in the portal yourself.` },
+  { who:'f', v:'scam', name:'Fake bank "token" call', place:'Desk phone · call', ctx:`Rachel uses a hardware token to log in to the company's treasury portal.`,
+    screen: (t,p) => CALL(t, H('f1',`Unknown · (646) 555-0133`), 'Incoming call', [['Caller', H('f2',`This is First Harbor Bank security. We blocked a suspicious wire on your account.`)], ['Caller', H('f3',`Read me the 6-digit code on your token so we can release it.`)], ['Caller', H('f4',`This has to happen in the next 10 minutes.`)]]),
+    f:[['f1','sender',`Unknown number`,`Not the bank's number on file.`],['f2','urgency',`A blocked wire`,`A scary story to get you moving.`],
+       ['f3','data',`Token code`,`That code lets them log in and send wires.`],['f4','urgency',`10-minute deadline`,`No time to check.`]],
+    do:`Hang up. Call the bank on the number on file. Never read token codes to anyone.` },
+  { who:'m', v:'safe', name:'Real expense approval', place:'Work laptop · expense system', ctx:`Omar approves team expense reports every Friday.`,
+    screen: () => WEB(H('f1',`https://expenses.${DOM}/approve`,'url'), `<h3>Expense report · Sam Patel</h3><p>${H('f2',`Client dinner, $142.60 · receipt attached · policy check passed`)}</p><p>${H('f3',`Submitted Wednesday`)}</p>`),
+    f:[['f1','ok',`Your company's system`,`You opened it yourself.`],['f2','ok',`Normal amount with receipt`,`Within policy.`],['f3','ok',`Routine timing`,`Your usual Friday approvals.`]],
+    do:`Real.` },
+  ]},
+
+sales: { label:'Sales', tag:'SLS', color:'--c-teens',
+  topics:['Fake POs','RFP login traps','CRM phishing','Order fraud','Trade show scams'],
+  headline:'Sales opens every email. Scammers know it.',
+  intro:'Tasha is an account executive and Ben runs the sales team. Watch for fake orders, lookalike customers and links dressed up as opportunities.',
+  people:{ f:person('Tasha','Reed','Account Exec','Lives in her inbox and CRM'), m:person('Ben','Carver','Sales Director','Approves big deals and travel') },
+  scenes:[
+  { who:'f', v:'scam', name:'Fake purchase order', place:'Work laptop · Outlook', ctx:`Tasha has been chasing a deal with Norvale Foods for months.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`New PO attached – urgent`, from:`Norvale Procurement ${H('f2',`&lt;norvale.procurement@gmail.com&gt;`)}`, to:p.email,
+      body:`${H('n1',`Hi Tasha,`)}<br><br>${H('f3',`Please find our purchase order attached and confirm today.`)}<br><br>${H('f4',`📎 PO_88213.zip`)}`}),
+    f:[['f1','sender',`External warning`,`Expected for customers, so check the address.`],['f2','sender',`Gmail, not norvale.com`,`Real procurement uses the company domain.`],
+       ['f3','urgency',`Confirm today`,`Excitement plus urgency.`],['f4','link',`A .zip attachment`,`Zipped "POs" are a common way to deliver malware.`]],
+    do:`Don't open it. Call your contact at Norvale on the number in the CRM to confirm.` },
+  { who:'f', v:'safe', name:'Real purchase order', place:'Work laptop · Outlook', ctx:`Tasha sent Norvale Foods quote Q-2290 last week.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:H('n2',`[EXTERNAL] This message came from outside ${CO}.`,'banner'), subj:`PO 77140 for quote Q-2290`, from:H('f1',`Erin Walsh &lt;erin.walsh@norvale.com&gt;`), to:p.email,
+      body:`Hi Tasha,<br><br>${H('f2',`Attached is PO 77140, matching your quote Q-2290.`)} ${H('f3',`Same ship-to as our last order.`)}<br><br>${H('n1',`📎 PO-77140.pdf`)}`}),
+    f:[['f1','ok',`Your known contact`,`On the customer's real domain, as in the CRM.`],['f2','ok',`Matches your quote`,`Same quote number.`],['f3','ok',`Nothing unusual`,`Same ship-to, normal attachment type.`]],
+    do:`Real. External is normal for customers; the details are what check out.` },
+  { who:'m', v:'scam', name:'RFP login trap', place:'Phone · ProNet DMs', ctx:`A "procurement manager" Ben doesn't know messages him on ProNet.`,
+    screen: () => CHAT('ProNet · Messaging', H('f1',`<b>Alan Pierce</b> · Procurement, Westmark Group · 2nd`), 'AP', [['Alan Pierce', H('f2',`We're inviting 3 suppliers to a $2M RFP. You made the list.`)], ['Alan Pierce', `${H('f3',`Sign in with your work Microsoft account to view the RFP:`)} ${H('f4',`westmark-rfp.docshare-online.com`,'url')}`]]),
+    f:[['f1','sender',`A stranger`,`No prior contact, and you can't verify the role.`],['f2','toogood',`A $2M opportunity out of nowhere`,`Bait for sales people.`],
+       ['f3','data',`Work login to view a document`,`Real RFPs never need your company password.`],['f4','link',`A generic doc-share site`,`Not Westmark's domain.`]],
+    do:`Look up Westmark's procurement contact yourself. Never enter your work password on a link someone sent.` },
+  { who:'m', v:'safe', name:'Real RFP invitation', place:'Work laptop · Outlook', ctx:`Ben registered ${CO} on Westmark's supplier portal last quarter.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`RFP 2026-114 is open`, from:H('f1',`Westmark Supplier Portal &lt;noreply@suppliers.westmark.com&gt;`), to:p.email,
+      body:`${H('f2',`A new RFP you're eligible for is open: Packaging services 2027.`)}<br><br>${H('f3',`Sign in to the supplier portal with your existing portal account to view it.`)} ${H('n1',`Closes Dec 12.`)}`}),
+    f:[['f1','ok',`Their real portal`,`The portal you registered with.`],['f2','ok',`Expected`,`You signed up for these notices.`],['f3','ok',`Your portal account`,`Not your company password.`]],
+    do:`Real. Go to the portal from your bookmark.` },
+  { who:'f', v:'scam', name:'CRM license phishing', place:'Work laptop · Outlook', ctx:`The sales team uses SalesTrack as its CRM.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Your SalesTrack license expires today`, from:H('f2',`SalesTrack Billing &lt;billing@salestrack-renewals.com&gt;`), to:p.email,
+      body:`${H('f3',`Your seat will be deactivated at midnight and your pipeline data deleted.`)}<br><br>${H('f4',`Renew now`,'btnlink')}`}),
+    f:[['f1','sender',`External warning`,`Licensing is handled by your admin.`],['f2','sender',`A renewals lookalike`,`Not SalesTrack's domain.`],
+       ['f3','urgency',`Data deleted at midnight`,`Fear of losing your pipeline.`],['f4','link',`Renew button`,`A fake login page for your CRM.`]],
+    do:`Ask your CRM admin. Licenses are company-managed, not renewed by you.` },
+  { who:'m', v:'safe', name:'Real CRM notification', place:'Work laptop · SalesTrack', ctx:`Ben is logged in to SalesTrack.`,
+    screen: () => APP('SalesTrack', `<div class="req"><div class="avatar">ST</div><div><b>${H('f1',`SalesTrack notifications`)}</b><div>${H('f2',`New lead assigned to you: Pinecrest Hardware (inbound web form)`)}</div><div class="meta">${H('f3',`Assigned by routing rule · 2 min ago`)}</div></div></div>`),
+    f:[['f1','ok',`Inside the app`,`Not an email.`],['f2','ok',`Normal work`,`A lead assignment.`],['f3','ok',`Explains itself`,`Routing rule, nothing to click elsewhere.`]],
+    do:`Real.` },
+  { who:'f', v:'scam', name:'New-customer order fraud', place:'Work laptop · Outlook', ctx:`A brand-new customer wants a big order fast.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Large order – net 30 terms`, from:H('f2',`Purchasing &lt;orders@brightline-supply-usa.com&gt;`), to:p.email,
+      body:`${H('f3',`We'd like 40 pallets shipped this week on net 30 credit terms.`)}<br><br>${H('f4',`Ship to our freight forwarder in Miami, not our office.`)} ${H('n1',`Company website: brightline-supply-usa.com`)}`}),
+    f:[['f1','sender',`External, unknown`,`No history with this company.`],['f2','sender',`A new, generic company`,`Easy to set up and vanish.`],
+       ['f3','toogood',`Big order, credit, rush`,`They want the goods before anyone checks credit.`],['f4','sender',`Ship to a forwarder`,`Goods leave the country and the "customer" disappears.`]],
+    do:`Run a credit check and verify the company independently before quoting terms.` },
+  { who:'m', v:'safe', name:'Real customer reorder', place:'Work laptop · Outlook', ctx:`Pinecrest Hardware reorders the same products every quarter.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`Q1 reorder`, from:H('f1',`Joe Martinez &lt;joe@pinecresthardware.com&gt;`), to:p.email,
+      body:`${H('f2',`Same as last quarter please: 12 pallets, same ship-to.`)} ${H('f3',`Our PO will come through the usual EDI feed.`)}`}),
+    f:[['f1','ok',`A long-time contact`,`Their real domain.`],['f2','ok',`Same as always`,`Same quantity and address.`],['f3','ok',`Usual channel`,`EDI, as always.`]],
+    do:`Real.` },
+  { who:'m', v:'scam', name:'Trade show attendee list', place:'Work laptop · Outlook', ctx:`Ben's team exhibited at PackExpo last month.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`PackExpo 2026 attendee list`, from:H('f2',`Data Team &lt;lists@expo-leads-data.com&gt;`), to:p.email,
+      body:`${H('f3',`Get all 18,450 verified attendee contacts for just $399.`)} ${H('f4',`Offer ends today. Reply "interested" for payment details.`)}`}),
+    f:[['f1','sender',`External warning`,`Not the show organizer.`],['f2','sender',`A data broker`,`Not affiliated with the event.`],
+       ['f3','toogood',`Every attendee for $399`,`Organizers don't sell full lists.`],['f4','urgency',`Ends today`,`Pressure to pay before checking.`]],
+    do:`Delete it. Get leads only from the official organizer's lead scanner.` },
+  { who:'f', v:'safe', name:'Real booth confirmation', place:'Work laptop · Outlook', ctx:`Tasha booked a booth for next year's PackExpo through the organizer's site.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`Booth 1204 confirmed`, from:H('f1',`PackExpo Exhibitor Services &lt;exhibitors@packexpo.org&gt;`), to:p.email,
+      body:`${H('f2',`Your booth 1204 for PackExpo 2027 is confirmed.`)} ${H('f3',`Manage your booth in the exhibitor portal.`)}`}),
+    f:[['f1','ok',`The organizer's domain`,`Where you booked.`],['f2','ok',`Matches your booking`,`Same booth.`],['f3','ok',`Portal, not payment`,`Nothing new to pay.`]],
+    do:`Real.` },
+  ]},
+
+manufacturing: { label:'Manufacturing', tag:'MFG', color:'--c-kids',
+  topics:['Fake firmware updates','Remote access calls','Tailgating','Dropped USB drives','Fake training links'],
+  headline:'On the plant floor, attacks come through machines, doors and USB ports.',
+  intro:'Maria supervises the plant and Greg leads maintenance. Scammers target equipment access and physical security as much as email.',
+  people:{ f:person('Maria','Lopez','Plant Supervisor','Runs shifts and plant access'), m:person('Greg','Novak','Maintenance Lead','Keeps the lines and controllers running') },
+  scenes:[
+  { who:'m', v:'scam', name:'Fake firmware update', place:'Work tablet · email', ctx:`Greg maintains the line controllers made by Delmar Automation.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`CRITICAL firmware update for Delmar controllers`, from:H('f2',`Delmar Support &lt;support@delmar-automation-updates.com&gt;`), to:p.email,
+      body:`${H('f3',`A critical flaw affects your controllers. Install this firmware today to avoid shutdown.`)}<br><br>${H('f4',`Download firmware v4.2`,'btnlink')} ${H('n1',`(load it via USB on each controller)`)}`}),
+    f:[['f1','sender',`External warning`,`Unexpected vendor email.`],['f2','sender',`Lookalike vendor domain`,`Not Delmar's real site.`],
+       ['f3','urgency',`"Avoid shutdown"`,`Fear of downtime.`],['f4','link',`Firmware from a link`,`Malicious firmware can take over production equipment.`]],
+    do:`Never install firmware from an email. Get updates through the vendor's support portal and your OT/IT change process.` },
+  { who:'m', v:'safe', name:'Real vendor service visit', place:'Work tablet · vendor portal', ctx:`Greg opened service case 55102 with Delmar last week.`,
+    screen: () => WEB(H('f1',`https://support.delmarautomation.com/cases/55102`,'url'), `<h3>Case 55102 · Scheduled visit</h3><p>${H('f2',`Technician: Ray Ochoa · Thursday 9 AM · pre-registered with your front desk`)}</p><p>${H('f3',`Firmware will be applied on-site under your change ticket CHG-3381.`)}</p>`),
+    f:[['f1','ok',`The vendor's real portal`,`Your existing case.`],['f2','ok',`Pre-registered visitor`,`Front desk knows they're coming.`],['f3','ok',`Through change control`,`A ticket you approved.`]],
+    do:`Real.` },
+  { who:'m', v:'scam', name:'Remote access call', place:'Plant phone · call', ctx:`The furnace line is running fine today.`,
+    screen: (t,p) => CALL(t, H('f1',`Unknown · (888) 555-0102`), 'Incoming call', [['Caller', H('f2',`This is Delmar remote support. Your furnace controller is sending error codes to us.`)], ['Caller', H('f3',`Install the QuickConnect app on the HMI and read me the access code.`)], ['Caller', H('f4',`If we don't fix it in 30 minutes the line could go down.`)]]),
+    f:[['f1','sender',`Unknown caller`,`You didn't open a case.`],['f2','sender',`Unprompted "error codes"`,`Vendors don't usually monitor your line uninvited.`],
+       ['f3','data',`Remote access to the HMI`,`Gives a stranger control of plant equipment.`],['f4','urgency',`Line could go down`,`Fear of downtime.`]],
+    do:`Hang up. Call the vendor using the number in your contract and involve IT before any remote access.` },
+  { who:'f', v:'safe', name:'Real IT remote session', place:'Plant office PC', ctx:`Maria put in an IT ticket this morning about her scheduling software.`,
+    screen: () => APP('IT Remote Support', `<div class="kidcard"><h3>${H('f1',`${CO} IT is requesting to view your screen`)}</h3><p>${H('f2',`Ticket INC-20417 · Technician: Leah from the IT help desk`)}</p><p>${H('f3',`You can end the session at any time.`)}</p><p>${H('n1',`Allow`,'btnlink')}</p></div>`),
+    f:[['f1','ok',`Your company's IT tool`,`Not a downloaded app.`],['f2','ok',`Your ticket`,`You asked for help.`],['f3','ok',`You stay in control`,`You can stop it anytime.`]],
+    do:`Real.` },
+  { who:'f', v:'scam', name:'Tailgating at the gate', place:'Plant entrance', ctx:`Maria is badging through the side door after lunch.`,
+    screen: () => CHAT('At the door', H('f1',`<b>Man in a hi-vis vest</b> · no visible badge`), '?', [['Man', H('f2',`Hey, hold the door? I'm the new HVAC contractor.`)], ['Man', H('f3',`Left my badge in the truck and I'm late for the roof job.`)], ['Man', H('n1',`Appreciate it!`)]]),
+    f:[['f1','sender',`No badge`,`A vest isn't ID.`],['f2','sender',`"New contractor"`,`Not on any list you've seen.`],['f3','urgency',`Late and badge-less`,`A story to make you feel rude saying no.`]],
+    do:`Politely send them to the front desk to sign in. Everyone badges in, every time.` },
+  { who:'f', v:'safe', name:'Real escorted contractor', place:'Plant entrance', ctx:`Facilities scheduled HVAC work on the roof today.`,
+    screen: () => CHAT('At the front desk', H('f1',`<b>Front desk</b> · visitor system`), 'FD', [['Front desk', H('f2',`Your 1 PM visitor is here: Carl Jensen, Polar Air HVAC. Visitor badge issued.`)], ['Front desk', H('f3',`Facilities (Tom) will escort him to the roof.`)]]),
+    f:[['f1','ok',`Through the front desk`,`Signed in properly.`],['f2','ok',`Expected and badged`,`Scheduled work.`],['f3','ok',`Escorted`,`Someone responsible goes with him.`]],
+    do:`Real.` },
+  { who:'m', v:'scam', name:'USB drive in the parking lot', place:'Parking lot', ctx:`Greg finds a USB drive next to his truck.`,
+    screen: () => box('Found item', `<div class="big-emoji">💾</div><h3>${H('f1',`Label: "Q4 Layoffs – Confidential"`)}</h3><p>${H('f2',`Found on the ground in the employee lot`)}</p><p>${H('f3',`Nearest computer: the maintenance shop PC`)}</p>`),
+    f:[['f1','toogood',`An irresistible label`,`Designed to make you plug it in.`],['f2','sender',`Unknown origin`,`Dropped drives are a classic attack.`],['f3','link',`Plugging into a plant PC`,`Malware could spread to production systems.`]],
+    do:`Don't plug it in anywhere. Hand it to IT or security.` },
+  { who:'m', v:'safe', name:'Real IT-issued USB', place:'Maintenance shop', ctx:`Greg asked IT for an approved drive to move machine logs.`,
+    screen: () => box('IT hand-off', `<div class="big-emoji">🔐</div><h3>${H('f1',`Encrypted USB · asset tag IT-08812`)}</h3><p>${H('f2',`Handed over by IT for ticket REQ-7734`)}</p><p>${H('f3',`Only works on company devices`)}</p>`),
+    f:[['f1','ok',`Company asset`,`Tagged and encrypted.`],['f2','ok',`Tied to your request`,`You asked for it.`],['f3','ok',`Locked down`,`Approved use only.`]],
+    do:`Real.` },
+  { who:'f', v:'scam', name:'Fake safety training link', place:'Phone · texts', ctx:`Annual safety training is due next month.`,
+    screen: (t,p) => P(t, '#', H('f1',`+1 (702) 555-0164`), 'Text message', [`${H('f2',`URGENT: Mandatory OSHA training must be completed TODAY or you'll be removed from the schedule.`)} ${H('f3',`Log in with your work account: osha-training-portal.co`,'url')}`]),
+    f:[['f1','sender',`A random number`,`Training comes through the company LMS.`],['f2','urgency',`Threat to your shifts`,`Fear to rush you.`],['f3','link',`Work login on a strange site`,`Steals your company password.`]],
+    do:`Open training only through the company LMS. Report the text to IT.` },
+  { who:'f', v:'safe', name:'Real training assignment', place:'Work laptop · Outlook', ctx:`Annual safety training season has started.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`Assigned: Annual forklift safety refresher`, from:H('f1',`${CO} Learning &lt;lms@${DOM}&gt;`), to:p.email,
+      body:`${H('f2',`You've been assigned the annual forklift safety refresher. Due December 15.`)} ${H('f3',`Find it under My Learning in the LMS.`)}`}),
+    f:[['f1','ok',`Internal LMS`,`From ${DOM}.`],['f2','ok',`Normal deadline`,`Weeks away.`],['f3','ok',`Go there yourself`,`No login link.`]],
+    do:`Real.` },
+  ]},
+
+it: { label:'IT', tag:'IT', color:'--c-young',
+  topics:['Help desk vishing','Fake patches','Admin console phishing','Malicious "coding tests"','Domain renewals'],
+  headline:'IT holds the keys, so attackers try to borrow them.',
+  intro:'Aisha works the help desk and Kevin runs the systems. Expect impersonation, fake advisories and tricks aimed at admin access.',
+  people:{ f:person('Aisha','Grant','Help Desk Analyst','Resets passwords and MFA'), m:person('Kevin','Shaw','Systems Admin','Manages servers, firewall and domains') },
+  scenes:[
+  { who:'f', v:'scam', name:'Help desk MFA reset vishing', place:'Help desk phone · call', ctx:`A caller says she's the CFO.`,
+    screen: (t,p) => CALL(t, H('f1',`External · (917) 555-0119`), 'Incoming call', [['Caller', H('f2',`This is Dana Brooks, CFO. I got a new phone and I'm locked out.`)], ['Caller', H('f3',`I'm boarding a flight in 10 minutes, just reset my MFA to this number.`)], ['Caller', H('f4',`Please skip the callback, I won't have signal.`)]]),
+    f:[['f1','sender',`An outside number`,`Not the CFO's number on file.`],['f2','sender',`Claims to be an executive`,`Executives are favorite impersonation targets.`],
+       ['f3','urgency',`Boarding in 10 minutes`,`Rush to skip verification.`],['f4','secrecy',`Skip the callback`,`They're asking you to bypass the control that stops this.`]],
+    do:`Follow identity verification every time: call back on the number on file and get manager approval. No exceptions for urgency or rank.` },
+  { who:'f', v:'safe', name:'Real verified reset', place:'Help desk · ticket system', ctx:`Aisha is working a password reset ticket.`,
+    screen: () => WEB(H('f1',`https://helpdesk.${DOM}/tickets/INC-20533`,'url'), `<h3>INC-20533 · Password reset · Sam Patel</h3><p>${H('f2',`Identity verified by callback to number on file at 9:12`)}</p><p>${H('f3',`Manager approval: Rachel Kim ✓`)}</p>`),
+    f:[['f1','ok',`Your ticket system`,`Logged properly.`],['f2','ok',`Callback verified`,`Using the number on file.`],['f3','ok',`Approved`,`Second person signed off.`]],
+    do:`Real. Proceed.` },
+  { who:'m', v:'scam', name:'Fake firewall advisory', place:'Work laptop · Outlook', ctx:`${CO} uses ArcWall firewalls.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`URGENT: ArcWall zero-day, patch immediately`, from:H('f2',`ArcWall PSIRT &lt;security@arcwall-patches.net&gt;`), to:p.email,
+      body:`${H('f3',`Active exploitation in the wild. Apply hotfix within 1 hour.`)}<br><br>${H('f4',`Download hotfix (.exe)`,'btnlink')}`}),
+    f:[['f1','sender',`External warning`,`Check every advisory's source.`],['f2','sender',`Lookalike vendor domain`,`Not ArcWall's real site.`],
+       ['f3','urgency',`One hour`,`Rushing you past verification.`],['f4','link',`An .exe from email`,`Real patches come from the vendor portal.`]],
+    do:`Check the vendor's official advisory page and support portal. Never run patches from email links.` },
+  { who:'m', v:'safe', name:'Real vendor advisory', place:'Work laptop · Outlook', ctx:`Kevin subscribed to ArcWall's security notices.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:H('n1',`[EXTERNAL] This message came from outside ${CO}.`,'banner'), subj:`Security advisory AW-2026-031`, from:H('f1',`ArcWall Security &lt;psirt@arcwall.com&gt;`), to:p.email,
+      body:`${H('f2',`A medium-severity issue affects firmware 9.1. Fixed in 9.1.4.`)}<br><br>${H('f3',`Details and downloads are in the ArcWall support portal (login required).`)}`}),
+    f:[['f1','ok',`The vendor's real domain`,`A list you subscribed to.`],['f2','ok',`Calm and specific`,`Version numbers, real severity.`],['f3','ok',`Points to the portal`,`No attachment, no direct download.`]],
+    do:`Real. Get the fix from the portal and schedule it through change control.` },
+  { who:'m', v:'scam', name:'Fake domain renewal', place:'Work laptop · Outlook', ctx:`Kevin manages ${DOM}, which auto-renews each March.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`${DOM} expires in 48 hours`, from:H('f2',`Domain Services &lt;renewals@domain-registry-notice.com&gt;`), to:p.email,
+      body:`${H('f3',`Your domain will be released to the public if not renewed in 48 hours.`)} ${H('f4',`Renew for $89`,'btnlink')}`}),
+    f:[['f1','sender',`External`,`Not your registrar.`],['f2','sender',`Generic "registry" name`,`A known slamming scam.`],['f3','urgency',`48 hours`,`Wrong too: your domain renews in March.`],['f4','payment',`Pay through their link`,`You'd be transferring or paying a scammer.`]],
+    do:`Check expiry in your actual registrar account. Ignore these.` },
+  { who:'m', v:'safe', name:'Real domain renewal', place:'Work laptop · Outlook', ctx:`${DOM} auto-renews in March with the company's registrar.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`Auto-renewal scheduled for ${DOM}`, from:H('f1',`NameSafe &lt;billing@namesafe.com&gt;`), to:p.email,
+      body:`${H('f2',`${DOM} will auto-renew on March 14 using the card on file.`)} ${H('f3',`Manage it in your NameSafe account.`)}`}),
+    f:[['f1','ok',`Your actual registrar`,`The account you use.`],['f2','ok',`Right date`,`Matches March renewal.`],['f3','ok',`No link to pay`,`Manage in your account.`]],
+    do:`Real.` },
+  { who:'f', v:'scam', name:'Admin console phishing', place:'Work laptop · Outlook', ctx:`Aisha has help desk admin rights in the email admin console.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Unusual admin sign-in detected`, from:H('f2',`Microsoft 365 Admin &lt;admin-alerts@m365-securitycenter.com&gt;`), to:p.email,
+      body:`${H('f3',`An unusual admin sign-in was detected. Review it now or admin rights will be suspended.`)}<br><br>${H('f4',`Review activity`,'btnlink')}`}),
+    f:[['f1','sender',`External warning`,`Real admin alerts appear in the admin center itself.`],['f2','sender',`Lookalike security domain`,`Not Microsoft's.`],['f3','urgency',`Rights suspended`,`Threat to your access.`],['f4','link',`Review link`,`A fake admin sign-in page.`]],
+    do:`Open the admin center from your bookmark to check alerts. Report the email.` },
+  { who:'f', v:'safe', name:'Real security alert', place:'Work laptop · security dashboard', ctx:`Aisha keeps the company's endpoint security dashboard open.`,
+    screen: () => WEB(H('f1',`https://edr.${DOM}/alerts/88102`,'url'), `<h3>Alert 88102 · Medium</h3><p>${H('f2',`Blocked: unsigned script on LAPTOP-2231 (user: sam.patel)`)}</p><p>${H('f3',`Action taken: quarantined · Assigned to: Help desk`)}</p>`),
+    f:[['f1','ok',`Your own security tool`,`Internal dashboard.`],['f2','ok',`Specific details`,`Device, user, what happened.`],['f3','ok',`Already contained`,`Normal triage.`]],
+    do:`Real. Follow your triage runbook.` },
+  { who:'m', v:'scam', name:'Malicious "coding test"', place:'Personal laptop · ProNet', ctx:`A recruiter offers Kevin a senior role.`,
+    screen: () => CHAT('ProNet · Messaging', H('f1',`<b>Jenna Ross</b> · Talent, Vertex Labs · joined 1 month ago`), 'JR', [['Jenna Ross', H('f2',`Salary $210K, fully remote. Just one quick step.`)], ['Jenna Ross', `${H('f3',`Clone our test repo and run npm install && npm start on your work laptop to show it builds:`)} ${H('f4',`github.com/vertex-labs-hiring/test-app`,'url')}`]]),
+    f:[['f1','sender',`New recruiter account`,`Thin history.`],['f2','toogood',`Great offer, little process`,`Bait.`],['f3','data',`Run code on your work laptop`,`Install scripts can steal credentials and keys.`],['f4','link',`An unknown repo`,`Malware disguised as a test.`]],
+    do:`Never run unknown code on company devices. Report it to security.` },
+  { who:'m', v:'safe', name:'Real change approval', place:'Work laptop · ticket system', ctx:`Kevin submitted a change to patch the file server tonight.`,
+    screen: () => WEB(H('f1',`https://helpdesk.${DOM}/changes/CHG-3390`,'url'), `<h3>CHG-3390 · Patch FS01 · Tonight 10 PM</h3><p>${H('f2',`Approved by: IT Manager, Change Board`)}</p><p>${H('f3',`Rollback plan attached · users notified`)}</p>`),
+    f:[['f1','ok',`Your change system`,`Internal.`],['f2','ok',`Properly approved`,`Two sign-offs.`],['f3','ok',`Planned`,`Rollback and notice in place.`]],
+    do:`Real.` },
+  ]},
+
+slt: { label:'Senior leadership', tag:'SLT', color:'--c-seniors',
+  topics:['Deepfake video calls','Whaling','Fake legal notices','Board impersonation','Fake e-signatures'],
+  headline:'Leaders have the authority attackers want to borrow.',
+  intro:'Dana is the CFO and Mark is the CEO. Attacks here impersonate executives, boards and lawyers, and they increasingly use AI voice and video.',
+  people:{ f:person('Dana','Brooks','CFO','Approves large payments and deals'), m:person('Mark','Ellison','CEO','Public face of the company') },
+  scenes:[
+  { who:'f', v:'scam', name:'Deepfake video call', place:'Work laptop · video call', ctx:`Dana joins a last-minute call from a link in a text that looked like it came from Mark.`,
+    screen: () => box('Video call · external meeting', `<div class="big-emoji">🎥</div><h3>${H('f1',`"Mark Ellison" · camera glitchy, audio slightly out of sync`)}</h3><p>${H('f2',`"Dana, I need you to approve a $1.2M wire for the Harlow deal before close of business."`)}</p><p>${H('f3',`"Keep it between us, the deal isn't public."`)}</p><p class="meta">${H('f4',`Meeting hosted on: secure-meet-call.com`)}</p>`),
+    f:[['f1','sender',`Something's off on video`,`AI deepfakes of executives are now used on live calls.`],['f2','payment',`Huge wire by end of day`,`Classic whaling ask.`],['f3','secrecy',`Keep it between us`,`Bypasses approvals.`],['f4','link',`Unknown meeting site`,`Not your company's video tool.`]],
+    do:`End the call and call Mark on his known number. Large wires always follow dual approval, no matter who asks.` },
+  { who:'f', v:'safe', name:'Real board meeting invite', place:'Work laptop · board portal', ctx:`The quarterly board meeting is next month.`,
+    screen: () => WEB(H('f1',`https://boardroom.${DOM}/meetings`,'url'), `<h3>Q4 Board Meeting · December 9</h3><p>${H('f2',`Agenda and pre-reads posted by the board secretary.`)}</p><p>${H('f3',`RSVP in the portal.`)}</p>`),
+    f:[['f1','ok',`Your board portal`,`Internal and secured.`],['f2','ok',`Expected meeting`,`On the normal calendar.`],['f3','ok',`Nothing risky asked`,`Just an RSVP.`]],
+    do:`Real.` },
+  { who:'m', v:'scam', name:'Fake lawsuit notice', place:'Work laptop · Outlook', ctx:`An alarming legal email arrives for Mark.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`NOTICE OF LAWSUIT – response required in 72 hours`, from:H('f2',`Court Notices &lt;filings@us-court-notice.com&gt;`), to:p.email,
+      body:`${H('f3',`A complaint has been filed naming you personally. Failure to respond within 72 hours may result in default judgment.`)}<br><br>${H('f4',`View complaint`,'btnlink')}`}),
+    f:[['f1','sender',`External warning`,`Courts don't serve lawsuits by random email.`],['f2','sender',`A generic "court" domain`,`Not a real court.`],['f3','urgency',`72-hour threat`,`Fear for you personally.`],['f4','link',`View complaint link`,`Malware or a fake login.`]],
+    do:`Forward it to general counsel and IT. Real legal notices come through counsel or a process server.` },
+  { who:'m', v:'safe', name:'Real counsel email', place:'Work laptop · Outlook', ctx:`Mark's outside counsel is reviewing a supplier contract.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:H('n1',`[EXTERNAL] This message came from outside ${CO}.`,'banner'), subj:`Supplier agreement – call Thursday?`, from:H('f1',`Helen Cho &lt;hcho@cho-legal.com&gt;`), to:p.email,
+      body:`${H('f2',`I've finished my markup of the Delmar agreement.`)} ${H('f3',`Can we talk Thursday at 2? I'll send the redline through our usual shared folder.`)}`}),
+    f:[['f1','ok',`Your known counsel`,`The firm you work with.`],['f2','ok',`Ongoing work`,`A matter you know about.`],['f3','ok',`Usual channel`,`No new links or logins.`]],
+    do:`Real.` },
+  { who:'m', v:'scam', name:'Fake journalist interview', place:'Work laptop · Outlook', ctx:`A reporter wants to interview Mark.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Interview request: Industry Leaders 2027`, from:H('f2',`Sarah Lin &lt;sarah.lin.reporter@gmail.com&gt;`), to:p.email,
+      body:`${H('f3',`You've been selected for our "Top 50 Industry Leaders" feature.`)} ${H('f4',`Please review the questions and sign in to confirm: industryleaders-media.com/questions`,'url')}`}),
+    f:[['f1','sender',`External`,`Media requests go through PR.`],['f2','sender',`A Gmail "reporter"`,`No outlet domain.`],['f3','toogood',`Flattering selection`,`Ego bait for executives.`],['f4','link',`Sign in to see questions`,`A credential trap.`]],
+    do:`Send media requests to the PR team to verify.` },
+  { who:'f', v:'safe', name:'Real PR request', place:'Work chat', ctx:`The PR team is preparing the year-end announcement.`,
+    screen: () => CHAT('Company chat', H('f1',`<b>Nina Alvarez</b> · Communications · ${CO}`), 'NA', [['Nina Alvarez', H('f2',`Hi Dana, could you review the two finance numbers in the press release draft?`)], ['Nina Alvarez', H('f3',`It's in the Comms folder, comments by Friday are fine.`)]]),
+    f:[['f1','ok',`Internal colleague`,`Known team.`],['f2','ok',`Normal review`,`Part of your role.`],['f3','ok',`Shared folder, no rush`,`Usual process.`]],
+    do:`Real.` },
+  { who:'m', v:'scam', name:'Board chair impersonation text', place:'Phone · texts', ctx:`Mark gets a text from a number he doesn't have saved.`,
+    screen: (t,p) => P(t, '#', H('f1',`+1 (212) 555-0181`), 'Text message', [`${H('f2',`Mark, it's Robert (board chair). New number.`)} ${H('f3',`Need you on a confidential call about an acquisition in 15 min.`)}`, H('f4',`Don't loop in anyone else yet, especially legal.`)]),
+    f:[['f1','sender',`Unknown number`,`Not Robert's saved contact.`],['f2','sender',`"New number"`,`The classic setup line.`],['f3','urgency',`15 minutes`,`Pressure.`],['f4','secrecy',`Don't tell legal`,`Isolating you from people who would stop it.`]],
+    do:`Call Robert on his known number. Never exclude legal on deal discussions.` },
+  { who:'m', v:'safe', name:'Real board chair email', place:'Work laptop · Outlook', ctx:`The board chair, Robert Hayes, often emails before meetings.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`Agenda thoughts for Dec 9`, from:H('f1',`Robert Hayes &lt;robert.hayes@${DOM}&gt;`), to:p.email,
+      body:`${H('f2',`Mark, I'd like 20 minutes on the 2027 capex plan at the next meeting.`)} ${H('f3',`Happy to discuss on our usual Friday call.`)}`}),
+    f:[['f1','ok',`His board account`,`Known address.`],['f2','ok',`Normal agenda topic`,`Nothing urgent or secret.`],['f3','ok',`Usual call`,`Established routine.`]],
+    do:`Real.` },
+  { who:'f', v:'scam', name:'Fake NDA e-signature', place:'Work laptop · Outlook', ctx:`An investment banker Dana doesn't know reaches out.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Please sign: NDA – Project Falcon`, from:H('f2',`SignDocs via Marcus Webb &lt;sign@signdocs-secure.net&gt;`), to:p.email,
+      body:`${H('f3',`A buyer is interested in acquiring part of your business. Sign the NDA to receive details.`)}<br><br>${H('f4',`Review &amp; sign`,'btnlink')}`}),
+    f:[['f1','sender',`External`,`Unexpected.`],['f2','sender',`Lookalike signing service`,`Not the real SignDocs domain.`],['f3','toogood',`A surprise acquisition interest`,`Tempting for a CFO.`],['f4','link',`Sign link`,`A fake sign-in page.`]],
+    do:`Route unsolicited deal approaches through legal. Open signing requests only from known senders.` },
+  { who:'f', v:'safe', name:'Real e-signature request', place:'Work laptop · Outlook', ctx:`Legal finished the Polar Air service contract you approved yesterday.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`Please sign: Polar Air service agreement`, from:H('f1',`SignDocs on behalf of ${CO} Legal &lt;legal@${DOM}&gt;`), to:p.email,
+      body:`${H('f2',`The Polar Air agreement you approved is ready for your signature.`)} ${H('f3',`Sent by Jamie Ortiz, Legal.`)}`}),
+    f:[['f1','ok',`From your own legal team`,`Internal sender.`],['f2','ok',`Something you approved`,`Expected.`],['f3','ok',`A named colleague`,`You can confirm in person.`]],
+    do:`Real.` },
+  ]},
+};
+
+DEPTS.hr = { label:'Human resources', tag:'HR', color:'--c-hr',
+  topics:['Malware résumés','Payroll diversion','Fake background checks','Fake labor audits','Job board phishing'],
+  headline:'HR holds everyone\'s personal data, and opens attachments from strangers all day.',
+  intro:'Lauren manages HR operations and Jamal recruits. Scammers send booby-trapped résumés, impersonate employees, and pose as agencies asking for records.',
+  people:{ f:person('Lauren','Price','HR Manager','Payroll changes, records and compliance'), m:person('Jamal','Owens','Recruiter','Screens candidates and posts jobs') },
+  scenes:[
+  { who:'m', v:'scam', name:'Booby-trapped résumé', place:'Work laptop · Outlook', ctx:`Jamal has an open Production Planner role.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Application – Production Planner (urgent)`, from:H('f2',`Kyle Brennan &lt;kbrennan.jobs@gmail.com&gt;`), to:p.email,
+      body:`Hi, ${H('n1',`I'm very interested in the role.`)} ${H('f3',`Please review my résumé today, I have another offer expiring tomorrow.`)}<br><br>${H('f4',`📎 Resume_Kyle_Brennan.zip`)} ${H('f5',`(password: 2026)`)}`}),
+    f:[['f1','sender',`Outside the hiring system`,`Real applicants usually apply through your applicant tracking system.`],['f2','sender',`Emailed straight to you`,`Not through the job posting.`],
+       ['f3','urgency',`Review it today`,`A competing offer is a pressure tactic.`],['f4','link',`A zipped "résumé"`,`Résumés are PDFs or Word files. Zips hide malware.`],['f5','link',`Password-protected`,`A password stops email scanners from checking it.`]],
+    do:`Don't open it. Ask the candidate to apply through the careers page, and report the email.` },
+  { who:'m', v:'safe', name:'Real application', place:'Work laptop · applicant tracking system', ctx:`Jamal is reviewing applicants for the Production Planner role.`,
+    screen: () => WEB(H('f1',`https://careers.${DOM}/ats/req-2214`,'url'), `<h3>New applicant · Production Planner</h3><p>${H('f2',`Priya Shah · résumé.pdf (scanned ✓)`)}</p><p>${H('f3',`Applied via careers page · 2 hours ago`)}</p>`),
+    f:[['f1','ok',`Your applicant system`,`Where applications belong.`],['f2','ok',`A scanned PDF`,`The system already checked the file.`],['f3','ok',`Normal channel`,`Came through the careers page.`]],
+    do:`Real. Review it in the system.` },
+  { who:'f', v:'scam', name:'Payroll diversion request', place:'Work laptop · Outlook', ctx:`Sam Patel works in Sales. Payday is Friday.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Change my direct deposit`, from:H('f2',`Sam Patel &lt;sam.patel.home@gmail.com&gt;`), to:p.email,
+      body:`Hi Lauren, ${H('f3',`I switched banks. Can you update my direct deposit to the account below before Friday's payroll?`)} ${H('f4',`I can't log in to the HR system from my phone right now.`)}`}),
+    f:[['f1','sender',`External`,`Employees email HR from work accounts.`],['f2','sender',`A personal Gmail`,`Anyone can make an address with Sam's name.`],
+       ['f3','payment',`New bank before payday`,`The paycheck would go to a scammer.`],['f4','secrecy',`Avoids the HR system`,`The system checks identity. Email doesn't.`]],
+    do:`Never change pay details by email. Ask Sam to update it himself in the HR system, or confirm in person.` },
+  { who:'f', v:'safe', name:'Real self-service bank change', place:'Work laptop · HR system', ctx:`Lauren reviews HR system notifications each morning.`,
+    screen: () => WEB(H('f1',`https://hr.${DOM}/notifications`,'url'), `<h3>Direct deposit updated · Sam Patel</h3><p>${H('f2',`Changed by the employee in self-service after MFA sign-in`)}</p><p>${H('f3',`Confirmation email sent to Sam's work address`)}</p>`),
+    f:[['f1','ok',`Your HR system`,`Internal.`],['f2','ok',`Done by the employee`,`Verified with MFA.`],['f3','ok',`Employee is notified`,`Sam would spot a change he didn't make.`]],
+    do:`Real. No action needed.` },
+  { who:'f', v:'scam', name:'Fake background check vendor', place:'Work laptop · Outlook', ctx:`${CO} uses ClearPath Screening for background checks.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Action needed: re-verify new hire SSNs`, from:H('f2',`ClearPath Compliance &lt;verify@clearpath-screening-us.com&gt;`), to:p.email,
+      body:`${H('f3',`Due to a system migration, please re-upload SSNs and birth dates for all new hires this quarter.`)}<br><br>${H('f4',`Upload securely`,'btnlink')} ${H('n1',`ClearPath Support`)}`}),
+    f:[['f1','sender',`External`,`Check it against your known vendor.`],['f2','sender',`Lookalike vendor domain`,`Not ClearPath's real domain.`],
+       ['f3','data',`Bulk SSNs and birth dates`,`A goldmine for identity theft.`],['f4','link',`Upload link`,`Sends data to the scammer.`]],
+    do:`Contact ClearPath through your existing portal or account manager. Never send SSNs through an email link.` },
+  { who:'f', v:'safe', name:'Real background check portal', place:'Work laptop · ClearPath portal', ctx:`A candidate accepted an offer yesterday.`,
+    screen: () => WEB(H('f1',`https://portal.clearpathscreening.com/orders`,'url'), `<h3>Order #CP-44812 · Priya Shah</h3><p>${H('f2',`Candidate consent received · check in progress`)}</p><p>${H('f3',`Estimated completion: 3 business days`)}</p>`),
+    f:[['f1','ok',`Your vendor's real portal`,`Bookmarked and signed in.`],['f2','ok',`Candidate consented`,`Through the proper process.`],['f3','ok',`Normal status`,`Nothing for you to send.`]],
+    do:`Real.` },
+  { who:'f', v:'scam', name:'Fake labor audit', place:'Work laptop · Outlook', ctx:`An official-looking email lands in Lauren's inbox.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`NOTICE OF AUDIT – Wage & Hour compliance`, from:H('f2',`Labor Compliance Division &lt;audit@labor-compliance-dept.org&gt;`), to:p.email,
+      body:`${H('f3',`Your company has been selected for a payroll audit. Submit all employee records within 48 hours to avoid penalties up to $50,000.`)}<br><br>${H('f4',`Submit records`,'btnlink')}`}),
+    f:[['f1','sender',`External`,`Government agencies use .gov domains.`],['f2','sender',`A .org posing as government`,`Sounds official, isn't.`],
+       ['f3','urgency',`48 hours and a big fine`,`Fear to skip checking with legal.`],['f4','data',`All employee records via a link`,`Real audits go through legal and formal letters.`]],
+    do:`Forward it to legal. Look up the agency's real contact details yourself before responding to any audit.` },
+  { who:'m', v:'safe', name:'Real hiring manager request', place:'Work chat', ctx:`Jamal supports the plant's hiring.`,
+    screen: () => CHAT('Company chat', H('f1',`<b>Maria Lopez</b> · Plant Supervisor · ${CO}`), 'ML', [['Maria Lopez', H('f2',`Hi Jamal, can we set up interviews for the 3 planner finalists next week?`)], ['Maria Lopez', H('f3',`Tue or Wed afternoons work best for me.`)]]),
+    f:[['f1','ok',`An internal colleague`,`A hiring manager you support.`],['f2','ok',`Normal recruiting work`,`Scheduling interviews.`],['f3','ok',`Nothing sensitive`,`No data, no links.`]],
+    do:`Real.` },
+  { who:'m', v:'scam', name:'Job board phishing', place:'Work laptop · Outlook', ctx:`Jamal posts jobs on HireHub.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Your job posting has been suspended`, from:H('f2',`HireHub Trust &amp; Safety &lt;support@hirehub-employer-verify.com&gt;`), to:p.email,
+      body:`${H('f3',`Your Production Planner listing was suspended for a policy violation. Verify your employer account within 24 hours to restore it.`)}<br><br>${H('f4',`Verify account`,'btnlink')}`}),
+    f:[['f1','sender',`External warning`,`Check every account notice's source.`],['f2','sender',`A lookalike support domain`,`Not hirehub.com.`],
+       ['f3','urgency',`24 hours to restore`,`Fear of losing applicants.`],['f4','link',`Verify link`,`A fake login to steal your employer account and post fake jobs.`]],
+    do:`Log in to HireHub from your bookmark to check your listing. Report the email.` },
+  { who:'m', v:'safe', name:'Real job board notice', place:'Work laptop · Outlook', ctx:`Jamal posted a new Maintenance Tech role on HireHub this morning.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`Your job is live: Maintenance Technician`, from:H('f1',`HireHub &lt;notifications@hirehub.com&gt;`), to:p.email,
+      body:`${H('f2',`Your Maintenance Technician posting is now live.`)} ${H('f3',`View applicants in your HireHub dashboard.`)}`}),
+    f:[['f1','ok',`The real platform`,`hirehub.com.`],['f2','ok',`Matches what you did`,`The job you posted today.`],['f3','ok',`Go to your dashboard`,`No verify-now link.`]],
+    do:`Real.` },
+  ]};
+
+DEPTS.rd = { label:'Design & product development', tag:'R&D', color:'--c-rd',
+  topics:['CAD file theft','Fake design awards','Malicious plugins','Expert network fishing','Prototype leaks'],
+  headline:'Your unreleased designs are what attackers want most.',
+  intro:'Mei designs new products and Tom leads engineering. Attackers want CAD files, prototypes and roadmaps, and they pose as suppliers, contests, bloggers and consultants to get them.',
+  people:{ f:person('Mei','Chen','Product Designer','Works on unreleased product designs'), m:person('Tom','Becker','Engineering Lead','Manages CAD files and supplier quotes') },
+  scenes:[
+  { who:'m', v:'scam', name:'Fake supplier wants CAD files', place:'Work laptop · Outlook', ctx:`Tom is sourcing parts for an unreleased product, Project Orion.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`Quote for Project Orion parts`, from:H('f2',`Precision Molding Asia &lt;sales@pm-asia-mfg.com&gt;`), to:p.email,
+      body:`${H('f3',`We can beat your current supplier by 30%.`)} ${H('f4',`Please send the full CAD assembly and drawings to our file share so we can quote today:`)} ${H('f5',`files.quickdrop-share.net/pm-asia`,'url')}`}),
+    f:[['f1','sender',`External`,`An unknown supplier.`],['f2','sender',`Not an approved supplier`,`No NDA or vendor record.`],['f3','toogood',`30% cheaper`,`Bait to get the files.`],
+       ['f4','data',`The full CAD assembly`,`Your unreleased design is the real target.`],['f5','link',`A random file-share site`,`Outside your approved supplier portal.`]],
+    do:`Share designs only with approved suppliers under NDA, through the supplier portal. Report the email.` },
+  { who:'m', v:'safe', name:'Real supplier quote request', place:'Work laptop · supplier portal', ctx:`Tom requested quotes from approved suppliers for Project Orion.`,
+    screen: () => WEB(H('f1',`https://plm.${DOM}/rfq/ORION-114`,'url'), `<h3>RFQ ORION-114 · Delmar Plastics</h3><p>${H('f2',`NDA on file (signed 2025) · approved supplier`)}</p><p>${H('f3',`Drawings shared in-portal, view-only, watermarked`)}</p>`),
+    f:[['f1','ok',`Your PLM system`,`The approved way to share.`],['f2','ok',`NDA on file`,`An approved supplier.`],['f3','ok',`Controlled sharing`,`View-only and watermarked.`]],
+    do:`Real.` },
+  { who:'f', v:'scam', name:'Fake design award', place:'Work laptop · Outlook', ctx:`Mei's work won an industry award two years ago.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:EXT, subj:`You're nominated: Global Product Design Awards 2027`, from:H('f2',`GPDA Committee &lt;entries@gpda-awards2027.com&gt;`), to:p.email,
+      body:`${H('f3',`Congratulations! To be considered, submit renders and specs of your upcoming products before they launch.`)} ${H('f4',`Entry fee: $295.`)} ${H('n1',`Deadline: Friday`)}`}),
+    f:[['f1','sender',`External`,`Unsolicited.`],['f2','sender',`A brand-new awards site`,`No track record.`],['f3','data',`Unreleased designs`,`Real awards judge launched products.`],['f4','payment',`Pay to be "nominated"`,`A money grab on top of the data grab.`]],
+    do:`Check with marketing before entering any award. Never submit unreleased designs.` },
+  { who:'f', v:'safe', name:'Real design review invite', place:'Work laptop · calendar', ctx:`Project Orion's next design review is coming up.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {subj:`Invitation: Orion design review · Thu 10 AM`, from:H('f1',`Tom Becker &lt;tom.becker@${DOM}&gt;`), to:p.email,
+      body:`${H('f2',`Design review for the Orion housing, Conference Room B.`)} ${H('f3',`Files are in the Orion folder in PLM.`)}`}),
+    f:[['f1','ok',`An internal colleague`,`Your engineering lead.`],['f2','ok',`An expected meeting`,`Part of the project plan.`],['f3','ok',`Files stay in PLM`,`No outside links.`]],
+    do:`Real.` },
+  { who:'f', v:'scam', name:'Malicious CAD plugin', place:'Work laptop · forum', ctx:`Mei is browsing a design forum for rendering tips.`,
+    screen: () => APP('Design forum · thread', `<div class="comments"><div><b>${H('f1',`render_wizard_99`)}</b> · new member<br>${H('f2',`FREE photoreal render plugin, normally $499!`)} ${H('f3',`Download: cadplug-free.xyz/render.exe`,'url')}<br>${H('f4',`Disable antivirus during install or it won't activate.`)}</div><div><b>${H('n1',`m_designs`)}</b><br>anyone tried this?</div></div>`),
+    f:[['f1','sender',`A brand-new account`,`No reputation.`],['f2','toogood',`$499 tool for free`,`Cracked or fake software often carries malware.`],['f3','link',`An .exe from a random site`,`Not the vendor's store.`],['f4','secrecy',`Turn off antivirus`,`A huge red flag.`]],
+    do:`Install software only from IT-approved sources. Ask IT if you need a plugin.` },
+  { who:'f', v:'safe', name:'Real CAD software update', place:'Work laptop · software center', ctx:`IT manages Mei's design software.`,
+    screen: () => APP('Software Center', `<div class="kidcard"><h3>${H('f1',`${CO} Software Center`)}</h3><p>${H('f2',`Update available: ShapeWorks CAD 2027.1 (approved by IT)`)}</p><p>${H('f3',`Installs tonight after 7 PM, or click Install now.`)}</p></div>`),
+    f:[['f1','ok',`IT's software portal`,`The approved source.`],['f2','ok',`Approved update`,`Tested by IT.`],['f3','ok',`No pressure`,`Your choice of timing.`]],
+    do:`Real.` },
+  { who:'m', v:'scam', name:'Expert network fishing', place:'Phone · email', ctx:`Tom gets an offer for a paid consulting call.`,
+    screen: (t,p) => MAIL('Personal mail', {subj:`Paid consultation: $600/hour`, from:H('f1',`Insight Bridge Experts &lt;calls@insightbridge-experts.com&gt;`), to:'tom.becker@mail.com',
+      body:`${H('f2',`A client would pay $600 for a one-hour call on "trends in your product category."`)} ${H('f3',`They're especially interested in launch timing and features for your 2027 lineup.`)} ${H('f4',`Please keep this between us.`)}`}),
+    f:[['f1','sender',`Sent to your personal email`,`Bypasses company monitoring.`],['f2','toogood',`$600 for an hour`,`Easy money as bait.`],['f3','data',`Your 2027 roadmap`,`Confidential plans a competitor wants.`],['f4','secrecy',`Keep it between us`,`It likely breaks your confidentiality agreement.`]],
+    do:`Decline, and tell your manager or legal. Never discuss unreleased products outside the company.` },
+  { who:'m', v:'safe', name:'Real patent attorney email', place:'Work laptop · Outlook', ctx:`Legal is filing a patent for Orion's hinge design.`,
+    screen: (t,p) => MAIL(`Inbox · ${p.email}`, {banner:H('n1',`[EXTERNAL] This message came from outside ${CO}.`,'banner'), subj:`Orion hinge – draft claims ready`, from:H('f1',`Ravi Iyer &lt;riyer@iyer-ip.com&gt;`), to:p.email,
+      body:`${H('f2',`The draft claims for the hinge patent are ready for your technical review.`)} ${H('f3',`I've posted them to the secure legal workspace your IP counsel set up.`)}`}),
+    f:[['f1','ok',`Your company's patent firm`,`Engaged by legal.`],['f2','ok',`Expected work`,`A filing you're part of.`],['f3','ok',`Secure workspace`,`No new link or login.`]],
+    do:`Real.` },
+  { who:'f', v:'scam', name:'Blogger wants a sneak peek', place:'Phone · social DMs', ctx:`Mei posts about design on social media.`,
+    screen: () => CHAT('Social · Message request', H('f1',`<b>gadget.insider.daily</b> · 8.2K followers · not verified`), 'GI', [['gadget.insider.daily', H('f2',`Huge fan of your work!! We're doing a "what's next" feature.`)], ['gadget.insider.daily', H('f3',`Any chance of a quick sneak-peek photo of what you're working on? We'll blur it 😉`)], ['gadget.insider.daily', H('f4',`Totally off the record, no one will know it came from you.`)]]),
+    f:[['f1','sender',`Unverified account`,`Could be anyone, including a competitor.`],['f2','toogood',`Flattery`,`Makes you want to share.`],['f3','data',`Photos of unreleased work`,`A leak, blurred or not.`],['f4','secrecy',`"Off the record"`,`Encourages breaking your confidentiality agreement.`]],
+    do:`Don't share. Send media requests to marketing.` },
+  { who:'m', v:'safe', name:'Real launch assets from marketing', place:'Work chat', ctx:`Orion launches in two weeks.`,
+    screen: () => CHAT('Company chat', H('f1',`<b>Nina Alvarez</b> · Marketing · ${CO}`), 'NA', [['Nina Alvarez', H('f2',`Approved launch images are in the Orion Launch folder, embargoed until the 18th.`)], ['Nina Alvarez', H('f3',`Can you check the specs table is right before we lock it?`)]]),
+    f:[['f1','ok',`Internal colleague`,`Your marketing team.`],['f2','ok',`Embargo respected`,`Shared internally, release date set.`],['f3','ok',`A normal review`,`Nothing leaves the company.`]],
+    do:`Real.` },
+  ]};
+
+Object.entries(DEPTS).forEach(([k,d])=>{ GROUPS[k] = {...d, times: WORKDAY, ages: d.tag, general: GENERAL, labels:['Scam or risky','Looks real']}; });
+
+
+/* ---------- Engine ---------- */
+const ORDER = ['finance','sales','manufacturing','it','hr','rd','slt'];
+const S = g => state.deck || g.scenes;
+function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function buildDeck(g){
+  /* 10 moments: 6 from the department's own pool + 4 from the general workplace pool,
+     shuffled, with 4–6 scams so players can't count on a fixed mix. */
+  let all = [];
+  for(let tries=0; tries<300; tries++){
+    all = [...shuffle(g.scenes).slice(0,6), ...shuffle(g.general||[]).slice(0,4)];
+    const sc = all.filter(s=>s.v==='scam').length;
+    if(sc>=4 && sc<=6) break;
+  }
+  return shuffle(all).map((s,k)=>({...s, t:g.times[k]}));
+}
+const roleOf = p => p.role ? `${p.name} · ${p.role}` : `${p.name}, ${p.age}`;
+const app = document.getElementById('app');
+let state = { route:null, g:null, i:-1, phase:'spot', results:[], run:null, saveStatus:null };
+let ASSIGN = null;
+try{ ASSIGN = JSON.parse(sessionStorage.getItem('adoAssign') || 'null'); }catch(err){}
+if(!ASSIGN || typeof ASSIGN !== 'object' || typeof ASSIGN.name !== 'string') ASSIGN = null;
+else ASSIGN = { rid: String(ASSIGN.rid||'').slice(0,80), name: ASSIGN.name.slice(0,60), team: String(ASSIGN.team||'').slice(0,60), group: String(ASSIGN.group||'') };
+let playerName = ASSIGN ? ASSIGN.name : '';
+let playerTeam = ASSIGN ? ASSIGN.team : '';
+let ROSTER = null, rosterDraft = null, rosterTeam = 'all', resTeam = 'all';
+const ARTIFACT_URL = 'https://claude.ai/artifact/7SYrqoEqYd8nA1u63G3wmr';
+const GITHUB_URL = 'https://dadcybertips.github.io/EduPage/';
+let linkBase = (window.claude && typeof window.claude.use === 'function') ? ARTIFACT_URL : (location.protocol.startsWith('http') ? location.origin + location.pathname : GITHUB_URL);
+const hexEnc = s => [...new TextEncoder().encode(s)].map(b=>b.toString(16).padStart(2,'0')).join('');
+const hexDec = h => { if(!/^([0-9a-f]{2})+$/.test(h)) return null; try{ return new TextDecoder('utf-8',{fatal:true}).decode(new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)))); }catch(err){ return null; } };
+function decodeAssign(h){
+  const s = hexDec(h); if(!s) return null;
+  const [v, rid, name, team, group] = s.split('|');
+  if(v!=='1' || !name) return null;
+  return { rid: rid||'', name: name.slice(0,60), team: (team||'').slice(0,60), group: GROUPS[group] ? group : '' };
+}
+const linkFor = p => `${linkBase.replace(/#.*$/,'')}#p-${hexEnc(['1', p.rid, p.name, p.team, p.group||''].join('|'))}`;
+const IN_VIEWER = !!(window.claude && typeof window.claude.use === 'function');
+const CAP = { db:null, user:null, dl:null, uid:null, admin:false, ready:!IN_VIEWER };
+let RES = null, resFilter = 'all', resOpen = null;
+
+const fl = s => s.f.map(([id,cat,label,why])=>({id,cat,label,why,ok:cat==='ok'}));
+const cats = g => g.kid ? KID_CATS : CATS;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const strip = s => String(s).replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+const fmtDate = ts => new Date(ts).toLocaleString(undefined, {month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'});
+function score(){ return state.results.reduce((s,r)=>s+(r?r.points:0),0); }
+
+(async function initCaps(){
+  if(!IN_VIEWER) return;
+  try{
+    const [db, user, dl] = await Promise.all([claude.use('db'), claude.use('user'), claude.use('downloads')]);
+    CAP.db = db; CAP.user = user; CAP.dl = dl;
+    if(user){ CAP.uid = await user.id(); CAP.admin = (await user.isOwner()) || (await user.canEdit()); }
+  }catch(e){}
+  CAP.ready = true;
+  if(state.run && !state.saveStatus) persist(state.run);
+  const g = GROUPS[state.g];
+  if(state.route || !g || state.i>=S(g).length) render(); else chrome();
+})();
+
+function chrome(){
+  const g = GROUPS[state.g];
+  const wrap = document.getElementById('wrap');
+  wrap.className = 'wrap' + (g && g.kid ? ' g-kids' : '');
+  if(g) wrap.style.setProperty('--accent', `var(${g.color})`); else wrap.style.removeProperty('--accent');
+  document.getElementById('backLink').hidden = !g && !state.route;
+  document.getElementById('resultsLink').hidden = !CAP.admin || state.route==='results';
+  document.getElementById('rosterLink').hidden = !CAP.admin || state.route==='roster';
+  const pill = document.getElementById('scorePill'); pill.hidden = !g || state.i<0; pill.textContent = `Score ${score()}`;
+  const tl = document.getElementById('timeline');
+  tl.hidden = !g || state.i<0;
+  if(g){
+    tl.innerHTML = S(g).map((s,k)=>{
+      const r = state.results[k], cls = (k===state.i && state.view==null) ? 'now' : r ? (r.correct?'right':'wrong') : '';
+      const viewing = state.view===k ? ' viewing' : '';
+      const missed = r && (!r.correct || r.found < r.total);
+      if(r && !(k===state.i && state.phase==='reveal' && state.view==null))
+        return `<button class="tchip ${cls}${viewing} reviewable" data-review="${k}" title="Review ${s.t}${missed?' (has mistakes)':''}">${s.t}${missed?' <b class="tmark">!</b>':' ✓'}</button>`;
+      return `<span class="tchip ${cls}">${s.t}</span>`;
+    }).join('');
+    const now = tl.querySelector('.now'); if(now) now.scrollIntoView({block:'nearest', inline:'center'});
+  }
+}
+
+function renderLanding(){
+  document.title = 'A Day Online';
+  const welcome = ASSIGN ? `<div class="card welcome"><div><b>Welcome, ${esc(ASSIGN.name)}</b>${ASSIGN.team?` · Team ${esc(ASSIGN.team)}`:''}<br><span class="hint">Pick your department to start. Your name and team are filled in on your report.</span></div><button class="btn ghost" data-act="clear-assign">Not you?</button></div>` : '';
+  app.innerHTML = `${welcome}<section class="hero">
+      <h2>Scams look different in <em>every department</em>.</h2>
+      <p class="lede">Pick your department and play through one workday. Each day picks 10 moments at random: some aimed at your department, some every employee sees. Scams and real messages are mixed, so no two plays are the same.</p>
+      <ul class="how"><li><span><b>Tap</b> anything that looks off</span></li><li><span><b>Decide</b> scam or safe</span></li><li><span><b>See</b> every red flag and what to do</span></li><li><span><b>Get</b> a report when you finish</span></li></ul>
+    </section>
+    <section class="groups">${ORDER.map(k=>{ const g=GROUPS[k]; return `<a class="gcard" href="#${k}" style="--gc:var(${g.color})">
+      <div class="ages">${g.ages}</div><h3>${g.label}</h3>
+      <div class="people">Play as ${g.people.f.name} (${g.people.f.role}) and ${g.people.m.name} (${g.people.m.role})</div>
+      <div class="chips">${g.topics.map(t=>`<span class="chip">${t}</span>`).join('')}</div>
+      <div class="go">Start the day →</div></a>`; }).join('')}</section>
+    <p class="note">For managers and trainers: every play draws a fresh set of moments, so people can replay their department's day and still be tested. All companies, apps and people are made up for training.${CAP.db ? ' When you finish a day, your results are saved to this page\'s results log for its owner.' : ' Nothing you tap leaves this page.'}</p>`;
+}
+
+function renderIntro(g){
+  document.title = `A Day Online · ${g.label}`;
+  app.innerHTML = `<section class="intro">
+    <div><div class="scamname">${g.label} · department</div>
+      <h2>${g.headline}</h2>
+      <p class="lede">${g.intro}</p>
+      <ol class="steps"><li>${g.kid?'Tap anything that looks tricky.':'Tap anything on the screen that looks off.'}</li><li>${g.kid?'Decide: tricky or OK?':'Decide: scam or safe?'}</li><li>${g.kid?'See what to watch for, and what to do.':'See every red flag, what you missed, and what to do instead.'}</li></ol>
+      <button class="btn" data-act="start">Start the day</button></div>
+    <div class="card personas">${['f','m'].map(k=>{ const p=g.people[k]; return `<div class="persona-head"><div class="persona-av">${p.name[0]}</div><div><h3>${roleOf(p)}</h3><p>${p.blurb}</p></div></div>`; }).join('')}
+      <p class="hint">You'll switch between them through the day. Each play picks 10 different moments at random.</p></div></section>
+    ${practiceHTML(g)}`;
+}
+
+/* ---------- Practice message on the start page (works exactly like a real moment) ---------- */
+const DEMO = {
+  screen: p => MAIL(`Inbox · ${p.email}`, {banner:H('d1',`[EXTERNAL] This message came from outside ${CO}. Be careful with links.`,'banner'),
+    subj:H('n1',`Quick favor`), from:`Your manager ${H('d2',`&lt;manager.office@gmail.com&gt;`)}`, to:p.email,
+    body:`${H('n2',`Hi ${p.first},`)}<br><br>${H('d3',`I need you to grab 5 x $100 gift cards for a client today.`)} ${H('d4',`Keep it quiet for now.`)}<br><br>${H('d5',`Reply with photos of the codes`,'btnlink')}`}),
+  f:[['d1','sender',`External warning`,`Your manager emails from inside the company.`],['d2','sender',`A Gmail address`,`Not your company's domain.`],
+     ['d3','payment',`Gift cards for a "client"`,`Gift cards are untraceable cash.`],['d4','secrecy',`Keep it quiet`,`Secrecy stops you from checking.`],
+     ['d5','data',`Photos of the codes`,`The codes are the money.`]]
+};
+function practiceHTML(g){
+  return `<section class="card practice"><div class="toolbar"><h3 style="margin:0">Practice first: this is how every moment works</h3><span class="chip">Doesn't count toward your score</span></div>
+    <p class="hint">Move your cursor over the message. Anything that lights up can be selected. Click the parts that look suspicious, then check your picks.</p>
+    <div class="practice-grid"><div class="stage spot" id="stage">${DEMO.screen(g.people.f)}</div>
+    <div class="practice-side"><p class="hint">Tap anything that looks suspicious. Tap again to unmark. <span class="marked-count" id="mc">0 marked</span></p>
+      <div class="actions"><button class="btn ghost" data-act="demo-check">Check my picks</button></div><div id="demoResult"></div></div></div></section>`;
+}
+function demoReveal(){
+  const flags = DEMO.f.map(([id,cat,label,why])=>({id,cat,label,why}));
+  const stage = document.getElementById('stage'); if(!stage) return;
+  const marked = [...stage.querySelectorAll('.hot.marked')].map(x=>x.dataset.f);
+  stage.classList.remove('spot'); stage.classList.add('reveal');
+  stage.querySelectorAll('.hot').forEach(el=>{
+    const id = el.dataset.f, k = flags.findIndex(f=>f.id===id), m = marked.includes(id);
+    el.removeAttribute('tabindex'); el.removeAttribute('role');
+    if(k>=0){ el.dataset.n = k+1; el.classList.add('is-flag'); if(!m) el.classList.add('missed'); } else if(m) el.classList.add('is-false');
+  });
+  const found = flags.filter(f=>marked.includes(f.id)).length, falses = marked.filter(id=>!flags.some(f=>f.id===id)).length;
+  document.getElementById('demoResult').innerHTML = `
+    <div class="${found===flags.length?'goodjob':'missbox'}" style="margin-top:12px">${found===flags.length?'<div class="gj-badge">✓ Good job!</div>':''}You spotted ${found} of ${flags.length} red flags.${found<flags.length?' The ones you missed are marked MISSED.':''}</div>
+    ${falses?`<p class="falsenote">${falses} thing${falses>1?'s':''} you marked ${falses>1?'were':'was'} not a red flag (crossed out).</p>`:''}
+    <ul class="flaglist" style="margin-top:12px">${flags.map((f,k)=>{ const got=marked.includes(f.id); return `<li class="${got?'':'missed-row'}"><span class="num ${got?'got':''}">${k+1}</span><div><b>${f.label}<span class="st ${got?'found':'missed'}">${got?'✓ Spotted':'✗ Missed'}</span></b><p>${f.why}</p></div></li>`; }).join('')}</ul>
+    <div class="actions" style="margin-top:12px"><button class="btn ghost" data-act="demo-reset">Try again</button><button class="btn" data-act="start">Start the day</button></div>`;
+  const btn = document.querySelector('[data-act="demo-check"]'); if(btn) btn.hidden = true;
+  const tip = document.getElementById('hoverTip'); if(tip) tip.className = '';
+}
+
+function renderScene(g){
+  const review = state.view!=null, idx = review ? state.view : state.i;
+  const s = S(g)[idx], flags = fl(s), r = state.results[idx], reveal = review || state.phase==='reveal';
+  const p = g.people[s.who];
+  let panel, legend = '';
+  if(!reveal){
+    panel = `<p class="context">${typeof s.ctx==='function' ? s.ctx(p) : s.ctx}</p>
+      <p class="hint"><span class="touch-hint">${g.kid?'Tap anything that looks tricky. Tap again to unmark.':'Tap anything that looks suspicious. Tap again to unmark.'} </span><span class="marked-count" id="mc">0 marked</span></p>
+      <div class="actions"><button class="btn scam" data-act="verdict" data-v="scam">${g.labels[0]}</button><button class="btn safe" data-act="verdict" data-v="safe">${g.labels[1]}</button></div>`;
+  } else {
+    const isScam = s.v==='scam';
+    const missedN = r.total - r.found;
+    const items = flags.map((f,k)=>{
+      const got = r.foundIds.includes(f.id);
+      const st = f.ok ? '' : `<span class="st ${got?'found':'missed'}">${got?'✓ Spotted':'✗ Missed'}</span>`;
+      return `<li class="${!f.ok && !got ? 'missed-row' : ''}"><span class="num ${f.ok||got?'got':''}">${k+1}</span><div><b>${f.label}${st}</b><p>${f.why}</p></div></li>`;
+    }).join('');
+    const next = state.i < S(g).length-1 ? `Next: ${S(g)[state.i+1].t}` : 'See your report';
+    const msg = r.correct ? (isScam ? (g.kid?'Yes! That was a trick.':'Right, this is a scam.') : (g.kid?'Yes! This one is OK.':'Right, this one is real.'))
+                          : (isScam ? (g.kid?'Oops, that was a trick.':'Not quite. This is a scam.') : (g.kid?'This one was actually OK.':'Not quite. This one is real.'));
+    panel = `<div class="${r.correct?'goodjob':''}">${r.correct?`<div class="gj-badge">✓ Good job!</div>`:''}<div class="scamname">${s.name}</div><div class="verdict ${r.correct?'right':'wrong'}"><span class="dot"></span>${msg}</div>${r.correct && isScam && r.found<r.total?`<p class="gj-note">You made the right call. Now look at the red flags you missed below.</p>`:''}</div>
+      ${isScam ? `<p class="hint">You spotted ${r.found} of ${r.total} red flags.</p>` : `<p class="hint">Why it checks out:</p>`}
+      ${isScam && missedN ? `<div class="missbox">You missed ${missedN}. ${missedN>1?'They are':'It is'} marked MISSED in red on the screen.</div>` : ''}
+      <ul class="flaglist">${items}</ul>
+      ${r.falseAlarms ? `<p class="falsenote">${r.falseAlarms} thing${r.falseAlarms>1?'s':''} you marked ${r.falseAlarms>1?'were':'was'} not a red flag (crossed out).</p>` : ''}
+      <div class="lesson"><b>What to do</b>${s.do}</div>
+      ${review ? `<button class="btn" data-act="review-back">Back to ${state.i>=S(g).length ? 'your report' : S(g)[state.i].t} →</button>` : `<button class="btn" data-act="next">${next} →</button>`}`;
+    if(review) panel = `<div class="reviewbar">Reviewing ${s.t} · read-only</div>` + panel;
+    legend = isScam
+      ? `<div class="legend"><span><i class="lg-got"></i>You spotted it</span><span><i class="lg-miss"></i>You missed it</span><span><i class="lg-false"></i>Not a red flag</span></div>`
+      : `<div class="legend"><span><i class="lg-got"></i>Why it's real</span><span><i class="lg-false"></i>Not a red flag</span></div>`;
+  }
+  app.innerHTML = `<section class="play">
+    <div class="stage ${reveal?'reveal':'spot'}" id="stage"><div class="stage-meta"><span class="clock">${s.t}</span><span class="who">${roleOf(p)}</span><span class="place">${s.place}</span></div>${s.screen(s.t, p)}${legend}</div>
+    <aside class="panel card ${reveal && r.correct ? 'good' : ''}">${panel}</aside></section>`;
+  if(!reveal && state.pendingMarks){
+    document.querySelectorAll('#stage .hot').forEach(el=>{ if(state.pendingMarks.includes(el.dataset.f)){ el.classList.add('marked'); el.setAttribute('aria-pressed','true'); } });
+    const mc = document.getElementById('mc'); if(mc) mc.textContent = `${state.pendingMarks.length} marked`;
+    state.pendingMarks = null;
+  }
+  if(reveal){
+    document.querySelectorAll('#stage .hot').forEach(el=>{
+      const id = el.dataset.f, k = flags.findIndex(f=>f.id===id), f = flags[k], m = r.marked.includes(id);
+      el.removeAttribute('tabindex'); el.removeAttribute('role');
+      if(f){ el.dataset.n = k+1; el.classList.add(f.ok?'is-ok':'is-flag'); if(!f.ok && !m) el.classList.add('missed'); }
+      else if(m) el.classList.add('is-false');
+    });
+  }
+}
+
+/* ---------- Completion report ---------- */
+function buildRun(g){
+  const rs = state.results, C = cats(g);
+  const by = {};
+  const scenes = S(g).map((s,k)=>{
+    const r = rs[k], bad = fl(s).filter(f=>!f.ok);
+    bad.forEach(f=>{ by[f.cat] ??= {hit:0,all:0}; by[f.cat].all++; if(r.foundIds.includes(f.id)) by[f.cat].hit++; });
+    return { t:s.t, name:s.name, who:g.people[s.who].name, v:s.v, call:r.call, correct:r.correct, found:r.found, total:r.total, falseAlarms:r.falseAlarms,
+      missed: bad.filter(f=>!r.foundIds.includes(f.id)).map(f=>f.label) };
+  });
+  const sorted = Object.entries(by).sort((a,b)=>(a[1].hit/a[1].all)-(b[1].hit/b[1].all));
+  const total = scenes.reduce((a,x)=>a+x.total,0);
+  return {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6), at: Date.now(),
+    group: state.g, groupLabel: g.label, name: playerName, team: playerTeam, rid: ASSIGN ? ASSIGN.rid : '',
+    score: score(), max: S(g).length*10 + total*5,
+    correct: scenes.filter(x=>x.correct).length, of: scenes.length,
+    scams: scenes.filter(x=>x.v==='scam').length, reals: scenes.filter(x=>x.v==='safe').length,
+    scamsCaught: scenes.filter(x=>x.v==='scam'&&x.correct).length, realTrusted: scenes.filter(x=>x.v==='safe'&&x.correct).length,
+    found: scenes.reduce((a,x)=>a+x.found,0), total, falseAlarms: scenes.reduce((a,x)=>a+x.falseAlarms,0),
+    blindSpot: sorted[0] && sorted[0][1].hit < sorted[0][1].all ? C[sorted[0][0]][0] : '',
+    byCat: sorted.map(([c,v])=>({cat:c, label:C[c][0], tip:C[c][1], hit:v.hit, all:v.all})),
+    scenes
+  };
+}
+
+async function persist(run){
+  if(!CAP.ready) return;                       // initCaps will call again
+  if(!CAP.db || !CAP.uid){ state.saveStatus = 'local'; updateSaveNote(); return; }
+  state.saveStatus = 'saving'; updateSaveNote();
+  const ref = CAP.db.doc('completions/' + CAP.uid);
+  try{
+    const snap = await ref.get();
+    const runs = snap.exists && Array.isArray(snap.data().runs) ? snap.data().runs.slice() : [];
+    if(!runs.some(x=>x.id===run.id)) runs.push(run);
+    await ref.set({ uid: CAP.uid, updated: Date.now(), runs: runs.slice(-40) });
+    state.saveStatus = 'saved';
+  }catch(e){ state.saveStatus = 'failed'; }
+  updateSaveNote();
+}
+function updateSaveNote(){
+  const el = document.getElementById('saveNote'); if(!el) return;
+  const map = { saving:['', 'Saving your result…'], saved:['ok', '✓ Saved to the results log.'], failed:['bad', "Couldn't save to the results log. You may need Contributor access to this page. Your report below still works."], local:['', 'This report stays on your device. Download it to keep a copy.'] };
+  const [cls, txt] = map[state.saveStatus] || ['', ''];
+  el.className = 'savenote ' + cls; el.textContent = txt;
+}
+
+function reportRows(run){
+  return run.scenes.map(x=>`<tr><td class="num-c">${x.t}</td><td><b>${esc(x.name)}</b><br><span class="meta">${esc(x.who)}</span></td>
+    <td>${x.v==='scam'?'Scam':'Real'}</td><td class="${x.correct?'good':'miss'}">${x.correct?'✓ Right':'✗ Wrong'}</td>
+    <td class="num-c">${x.v==='scam'?`${x.found}/${x.total}`:'–'}</td><td>${x.missed.length?`<span class="miss">${x.missed.map(esc).join(', ')}</span>`:'<span class="meta">None</span>'}</td></tr>`).join('');
+}
+
+function reportText(run){
+  const L = [`A Day Online report: ${run.groupLabel}`, run.name?`Player: ${run.name}`:'', run.team?`Team: ${run.team}`:'', `Completed: ${fmtDate(run.at)}`, '',
+    `Score: ${run.score} / ${run.max}`, `Right calls: ${run.correct}/${run.of} (scams caught ${run.scamsCaught}/${run.scams}, real ones trusted ${run.realTrusted}/${run.reals})`,
+    `Red flags spotted: ${run.found}/${run.total}`, `False alarms: ${run.falseAlarms}`, run.blindSpot?`Biggest blind spot: ${run.blindSpot}`:'', '', 'Moment by moment:'];
+  run.scenes.forEach(x=>L.push(`${x.t}  ${x.name} (${x.v==='scam'?'scam':'real'}): ${x.correct?'right':'wrong'}${x.v==='scam'?`, ${x.found}/${x.total} flags`:''}${x.missed.length?`. Missed: ${x.missed.join('; ')}`:''}`));
+  return L.filter((x,i)=>x!==''||i>0).join('\n');
+}
+
+function reportHTML(run){
+  const css = `body{font:15px/1.5 "Segoe UI",system-ui,sans-serif;color:#16212a;background:#fff;max-width:900px;margin:32px auto;padding:0 20px}h1{font-size:26px;margin:0 0 4px}h2{font-size:18px;margin:28px 0 8px}.meta{color:#5a6773;font-size:13px}.tiles{display:flex;flex-wrap:wrap;gap:24px;margin:16px 0}.tiles div{color:#5a6773;font-size:13px}.tiles b{display:block;font-size:24px;color:#16212a}table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#5a6773;border-bottom:1px solid #d4dbe2;padding:6px 8px}td{border-bottom:1px solid #d4dbe2;padding:8px;vertical-align:top}.miss{color:#c4441d;font-weight:700}.good{color:#2c7a4c;font-weight:700}li{margin-bottom:6px}`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>A Day Online report</title><style>${css}</style></head><body>
+<h1>A Day Online report: ${esc(run.groupLabel)}</h1><div class="meta">${run.name?esc(run.name)+' · ':''}${run.team?'Team '+esc(run.team)+' · ':''}Completed ${esc(fmtDate(run.at))}</div>
+<div class="tiles"><div><b>${run.score} / ${run.max}</b>score</div><div><b>${run.correct}/${run.of}</b>right calls</div><div><b>${run.scamsCaught}/${run.scams}</b>scams caught</div><div><b>${run.realTrusted}/${run.reals}</b>real ones trusted</div><div><b>${run.found}/${run.total}</b>red flags spotted</div><div><b>${run.falseAlarms}</b>false alarms</div></div>
+${run.blindSpot?`<p><b>Biggest blind spot:</b> ${esc(run.blindSpot)}</p>`:''}
+<h2>Moment by moment</h2><table><tr><th>Time</th><th>Moment</th><th>Was it</th><th>Your call</th><th>Flags</th><th>Missed</th></tr>${reportRows(run)}</table>
+<h2>Red flags by type</h2><table><tr><th>Type</th><th>Spotted</th><th>Remember</th></tr>${run.byCat.map(c=>`<tr><td>${esc(c.label)}</td><td class="${c.hit<c.all?'miss':'good'}">${c.hit}/${c.all}</td><td>${esc(c.tip)}</td></tr>`).join('')}</table>
+<p class="meta">A Day Online: scam-spotting practice. All companies, apps and people in the game are made up.</p></body></html>`;
+}
+
+async function saveFile(filename, data, mime){
+  if(CAP.dl){
+    try{ await CAP.dl.save({filename, data}); }catch(e){ flash(e && e.code==='unavailable' ? "Downloads aren't available here." : 'Download cancelled.'); }
+    return;
+  }
+  if(IN_VIEWER){ flash("Downloads aren't available here. Use Copy instead."); return; }
+  const url = URL.createObjectURL(new Blob([data], {type:mime}));
+  const a = Object.assign(document.createElement('a'), {href:url, download:filename});
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
+function flash(t){ const el=document.getElementById('flash'); if(el){ el.textContent=t; } }
+
+function renderSummary(g){
+  if(!state.run){ state.run = buildRun(g); persist(state.run); }
+  const run = state.run;
+  const rows = run.byCat.map(c=>{ const pct=Math.round(c.hit/c.all*100); return `<div class="bar-row ${pct<60?'weak':''}"><div class="lbl">${c.label}<span>${c.hit}/${c.all}</span></div><div class="track"><div class="fill" style="width:${pct}%"></div></div></div>`; }).join('');
+  const nextG = ORDER[(ORDER.indexOf(state.g)+1)%ORDER.length];
+  const canDownload = CAP.dl || !IN_VIEWER;
+  app.innerHTML = `<section class="summary">
+    <div class="card sum-hero"><div class="big">${run.score}<small> / ${run.max}</small></div>
+      <div><h2>${g.kid?'Great job finishing the day':'End of the day'}${run.name?', '+esc(run.name):''}${g.kid?'!':'.'}</h2>
+      <p class="hint">${run.blindSpot ? `Biggest blind spot: <b>${run.blindSpot.toLowerCase()}</b>.` : 'You caught every type of red flag.'}</p>
+      <div class="stats"><div><b>${run.correct}/${run.of}</b>right calls</div><div><b>${run.scamsCaught}/${run.scams}</b>scams caught</div><div><b>${run.realTrusted}/${run.reals}</b>real ones trusted</div><div><b>${run.found}/${run.total}</b>red flags spotted</div><div><b>${run.falseAlarms}</b>false alarms</div></div></div></div>
+    <div class="card"><div class="toolbar"><h3 style="margin:0">Your report</h3><div class="actions">
+      ${canDownload?`<button class="btn" data-act="dl-report">Download report</button>`:''}<button class="btn ghost" data-act="copy-report">Copy summary</button></div></div>
+      <p class="savenote" id="saveNote"></p><p class="savenote" id="flash" aria-live="polite"></p>
+      <textarea id="copyText" hidden readonly style="width:100%;min-height:160px;font:13px var(--mono)"></textarea>
+      <div class="tablewrap"><table class="report-table"><thead><tr><th>Time</th><th>Moment</th><th>Was it</th><th>Your call</th><th>Flags</th><th>What you missed</th></tr></thead><tbody>${reportRows(run)}</tbody></table></div></div>
+    <div class="grid2">
+      <div class="card"><h3>Red flags by type</h3><div class="bars">${rows}</div></div>
+      <div class="card"><h3>${g.kid?'Remember':'Your pocket checklist'}</h3><ul class="cheat">${run.byCat.map(c=>`<li><b>${c.label}</b><span>${c.tip}</span></li>`).join('')}</ul></div>
+    </div>
+    <div class="actions"><button class="btn" data-act="restart">Play this day again</button><a class="btn ghost" href="#${nextG}">Try ${GROUPS[nextG].label}</a><a class="btn ghost" href="#">All departments</a></div></section>`;
+  updateSaveNote();
+}
+
+/* ---------- Results log (owner and editors) ---------- */
+async function loadResults(){
+  RES = {loading:true}; renderResults();
+  try{
+    const snap = await Promise.race([CAP.db.collection('completions').get(), new Promise((_,rej)=>setTimeout(()=>rej({code:'timeout'}), 10000))]);
+    const runs = [];
+    snap.docs.forEach(d=>{ const b=d.data()||{}; (Array.isArray(b.runs)?b.runs:[]).forEach(x=>{ const c = cleanRun(x, d.id); if(c) runs.push(c); }); });
+    runs.sort((a,b)=>b.at-a.at);
+    const uids = [...new Set(runs.map(r=>r.uid))];
+    const profiles = uids.length && CAP.user ? await CAP.user.profiles(uids) : {};
+    await loadRoster(true);
+    RES = {runs, profiles};
+  }catch(e){ RES = {error: e && e.code==='timeout' ? 'The results log took too long to load. Try Refresh.' : "Couldn't load the results log."}; }
+  if(state.route==='results') renderResults();
+}
+/* Saved runs are written by players' browsers, so treat them as untrusted: keep only known fields,
+   coerce numbers, cap string lengths, and take the account id from the document id (not the body). */
+const cleanNum = v => { const n = Math.round(+v); return Number.isFinite(n) ? Math.max(0, Math.min(1e6, n)) : 0; };
+const cleanStr = (v, n=120) => typeof v === 'string' ? v.slice(0, n) : '';
+function cleanRun(x, docId){
+  if(!x || typeof x !== 'object') return null;
+  const at = +x.at;
+  return { id: cleanStr(x.id, 40) || Math.random().toString(36).slice(2), at: Number.isFinite(at) ? at : 0, uid: String(docId),
+    group: cleanStr(x.group, 40), groupLabel: cleanStr(x.groupLabel, 60), name: cleanStr(x.name, 60), team: cleanStr(x.team, 60), rid: cleanStr(x.rid, 80),
+    score: cleanNum(x.score), max: cleanNum(x.max), correct: cleanNum(x.correct), of: cleanNum(x.of), scams: cleanNum(x.scams), reals: cleanNum(x.reals),
+    scamsCaught: cleanNum(x.scamsCaught), realTrusted: cleanNum(x.realTrusted), found: cleanNum(x.found), total: cleanNum(x.total), falseAlarms: cleanNum(x.falseAlarms),
+    blindSpot: cleanStr(x.blindSpot, 80),
+    byCat: Array.isArray(x.byCat) ? x.byCat.slice(0, 20).map(c => ({label: cleanStr(c && c.label, 80), hit: cleanNum(c && c.hit), all: cleanNum(c && c.all)})) : [],
+    scenes: Array.isArray(x.scenes) ? x.scenes.slice(0, 20).map(y => ({t: cleanStr(y && y.t, 12), name: cleanStr(y && y.name, 80), v: y && y.v === 'scam' ? 'scam' : 'safe',
+      correct: !!(y && y.correct), missed: Array.isArray(y && y.missed) ? y.missed.slice(0, 10).map(m => cleanStr(m, 80)) : []})) : [] };
+}
+const accountName = r => (RES && RES.profiles && RES.profiles[r.uid] && RES.profiles[r.uid].name) || '';
+const personName = r => r.name || accountName(r) || 'Someone';
+/* Personal links can be edited, so show the signed-in account next to a claimed name when they differ. */
+const personCell = r => { const a = accountName(r); return esc(personName(r)) + (r.name && a && a !== r.name ? ` <span class="meta">(account: ${esc(a)})</span>` : ''); };
+/* Spreadsheet-safe CSV cell: neutralize leading = + - @ so exported names can't run as formulas. */
+const csvCell = v => { let t = String(v ?? ''); if(/^[=+\-@\t\r]/.test(t)) t = "'" + t; return `"${t.replace(/"/g,'""')}"`; };
+
+function renderResults(){
+  document.title = 'A Day Online · Results log';
+  let body;
+  if(!CAP.ready) body = `<p class="hint">Loading…</p>`;
+  else if(!CAP.db) body = `<p class="hint">The results log only works on the claude.ai version of this page. Players on other copies still get their own report.</p>`;
+  else if(!CAP.admin) body = `<p class="hint">Only the page owner and editors can see the results log.</p>`;
+  else if(!RES){ loadResults(); return; }
+  else if(RES.loading) body = `<p class="hint">Loading results…</p>`;
+  else if(RES.error) body = `<p class="savenote bad">${RES.error}</p>`;
+  else {
+    const teams = [...new Set([...RES.runs.map(r=>r.team||''), ...(ROSTER&&ROSTER.entries||[]).map(p=>p.team||'')].filter(Boolean))].sort();
+    const list = RES.runs.filter(r=>(resFilter==='all'||r.group===resFilter) && (resTeam==='all'||(r.team||'')===resTeam));
+    const assigned = (ROSTER&&ROSTER.entries||[]).filter(p=>resTeam==='all'||p.team===resTeam);
+    const doneRids = new Set(RES.runs.map(r=>r.rid).filter(Boolean));
+    const notStarted = assigned.filter(p=>!doneRids.has(p.rid));
+    const people = new Set(list.map(r=>r.uid)).size;
+    const avg = list.length ? Math.round(list.reduce((a,r)=>a+(r.max ? r.score/r.max : 0),0)/list.length*100) : 0;
+    const blind = Object.create(null); list.forEach(r=>r.byCat.forEach(c=>{ blind[c.label] ??= {m:0}; blind[c.label].m += Math.max(0, c.all-c.hit); }));
+    const top = Object.entries(blind).sort((a,b)=>b[1].m-a[1].m)[0];
+    const rows = list.map(r=>`<tr class="click" data-run="${esc(r.id)}"><td class="num-c">${esc(fmtDate(r.at))}</td><td>${personCell(r)}</td><td>${esc(r.team||'–')}</td><td>${esc(r.groupLabel)}</td>
+      <td class="num-c"><b>${r.score}</b>/${r.max}</td><td class="num-c">${r.correct}/${r.of}</td><td class="num-c">${r.scamsCaught}/${r.scams||6}</td><td class="num-c">${r.realTrusted}/${r.reals||6}</td><td class="num-c">${r.found}/${r.total}</td><td>${r.blindSpot?`<span class="miss">${esc(r.blindSpot)}</span>`:'<span class="good">None</span>'}</td></tr>
+      ${resOpen===r.id?`<tr class="detail"><td colspan="10"><b>Missed red flags</b><ul>${r.scenes.filter(x=>x.missed.length||!x.correct).map(x=>`<li>${esc(x.t)} · ${esc(x.name)}: ${x.correct?'':'<span class="miss">wrong call</span> '}${x.missed.length?'missed '+x.missed.map(esc).join(', '):''}</li>`).join('')||'<li>Nothing missed.</li>'}</ul></td></tr>`:''}`).join('');
+    body = `<div class="card tiles">${assigned.length?`<div><b>${assigned.length-notStarted.length}/${assigned.length}</b>assigned people finished</div>`:''}<div><b>${list.length}</b>completions</div><div><b>${people}</b>people</div><div><b>${avg}%</b>average score</div><div><b>${top&&top[1].m?esc(top[0]):'–'}</b>most-missed red flag</div></div>
+      <div class="card" style="display:grid;gap:14px"><div class="toolbar">
+        <div class="actions"><label for="resTeam" class="hint">Team <select id="resTeam"><option value="all">All</option>${teams.map(t=>`<option ${resTeam===t?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
+        <label for="resFilter" class="hint">Department <select id="resFilter"><option value="all">All</option>${ORDER.map(k=>`<option value="${k}" ${resFilter===k?'selected':''}>${GROUPS[k].label}</option>`).join('')}</select></label></div>
+        <div class="actions"><button class="btn ghost" data-act="refresh">Refresh</button>${CAP.dl?`<button class="btn" data-act="export-csv">Export CSV</button>`:''}</div></div>
+        <p class="savenote" id="flash" aria-live="polite"></p>
+        ${list.length ? `<div class="tablewrap"><table class="report-table"><thead><tr><th>Completed</th><th>Person</th><th>Team</th><th>Department</th><th>Score</th><th>Right calls</th><th>Scams caught</th><th>Real trusted</th><th>Flags spotted</th><th>Blind spot</th></tr></thead><tbody>${rows}</tbody></table></div><p class="hint">Click a row to see what that person missed.</p>`
+          : `<p class="hint">No completions yet. When someone finishes a day, it shows up here with their score and what they missed. Players need Contributor access (or organization-wide access) to save results.</p>`}
+      </div>
+      ${notStarted.length?`<div class="card"><h3>Not started yet (${notStarted.length})</h3><div class="tablewrap"><table class="report-table"><thead><tr><th>Name</th><th>Team</th><th>Email</th></tr></thead><tbody>${notStarted.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.team)}</td><td>${esc(p.email||'')}</td></tr>`).join('')}</tbody></table></div></div>`:''}`;
+  }
+  app.innerHTML = `<section class="summary"><div><h2 style="font-size:clamp(1.8rem,4vw,2.6rem)">Results log</h2><p class="hint">Every completed day, newest first. Only you and editors can see this.</p></div>${body}</section>`;
+  const sel = document.getElementById('resFilter'); if(sel) sel.addEventListener('change', e=>{ resFilter = e.target.value; renderResults(); });
+  const st = document.getElementById('resTeam'); if(st) st.addEventListener('change', e=>{ resTeam = e.target.value; renderResults(); });
+}
+
+function csv(){
+  const q = csvCell;
+  const head = ['Completed','Person','Account','Team','Department','Score','Max','Right calls','Scams caught','Real trusted','Flags spotted','Flags total','False alarms','Blind spot','Missed red flags'];
+  const lines = RES.runs.filter(r=>(resFilter==='all'||r.group===resFilter)&&(resTeam==='all'||(r.team||'')===resTeam)).map(r=>[new Date(r.at || 0).toISOString(), personName(r), accountName(r), r.team||'', r.groupLabel, r.score, r.max, r.correct, r.scamsCaught, r.realTrusted, r.found, r.total, r.falseAlarms, r.blindSpot,
+    r.scenes.filter(x=>x.missed.length).map(x=>`${x.name}: ${x.missed.join('; ')}`).join(' | ')].map(q).join(','));
+  return [head.map(q).join(','), ...lines].join('\n');
+}
+
+/* ---------- Roster: personal links for each person ---------- */
+const GROUP_ALIASES = { 'finance':'finance', 'accounting':'finance', 'ap':'finance', 'accounts payable':'finance', 'payroll':'finance', 'treasury':'finance',
+  'sales':'sales', 'business development':'sales', 'account management':'sales',
+  'manufacturing':'manufacturing', 'production':'manufacturing', 'plant':'manufacturing', 'operations':'manufacturing', 'maintenance':'manufacturing', 'mfg':'manufacturing',
+  'it':'it', 'information technology':'it', 'help desk':'it', 'helpdesk':'it', 'infrastructure':'it',
+  'hr':'hr', 'human resources':'hr', 'people':'hr', 'people ops':'hr', 'recruiting':'hr', 'talent':'hr', 'talent acquisition':'hr',
+  'rd':'rd', 'r&d':'rd', 'design':'rd', 'product development':'rd', 'new product development':'rd', 'npd':'rd', 'engineering':'rd', 'product':'rd', 'design & product development':'rd',
+  'slt':'slt', 'senior leadership':'slt', 'senior leadership team':'slt', 'leadership':'slt', 'executive':'slt', 'executives':'slt', 'exec':'slt' };
+const slug = s => String(s||'').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,24);
+
+function parseCSV(text){
+  text = String(text||'').replace(/^﻿/,'');
+  const first = text.split(/\r?\n/)[0] || '';
+  const sep = first.includes('\t') ? '\t' : ',';
+  const rows = []; let row = [], cur = '', q = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){ cur+='"'; i++; } else q=false; } else cur+=c; }
+    else if(c==='"') q = true;
+    else if(c===sep){ row.push(cur); cur=''; }
+    else if(c==='\n' || c==='\r'){ if(c==='\r' && text[i+1]==='\n') i++; row.push(cur); rows.push(row); row=[]; cur=''; }
+    else cur += c;
+  }
+  if(cur!=='' || row.length){ row.push(cur); rows.push(row); }
+  return rows.map(r=>r.map(x=>x.trim())).filter(r=>r.some(x=>x));
+}
+
+function draftFrom(text, existing){
+  const rows = parseCSV(text);
+  if(!rows.length) return {entries:[], errors:['The list is empty.']};
+  const h = rows[0].map(x=>x.toLowerCase());
+  const hasHeader = h.some(x=>/name|team/.test(x));
+  const col = (re, d) => { const i = h.findIndex(x=>re.test(x)); return hasHeader ? i : d; };
+  const ci = { name: col(/name/,0), team: col(/team/,1), group: col(/dep|age|group/,2), email: col(/mail/,3) };
+  const used = new Set((existing||[]).map(p=>p.rid));
+  const entries = [], errors = [];
+  rows.slice(hasHeader?1:0).forEach((r,k)=>{
+    const name = (r[ci.name]||'').slice(0,60), team = (ci.team>=0 ? r[ci.team]||'' : '').slice(0,60);
+    const gRaw = (ci.group>=0 ? r[ci.group]||'' : '').toLowerCase().trim();
+    const tRaw = (ci.team>=0 ? r[ci.team]||'' : '').toLowerCase().trim();
+    const group = GROUPS[GROUP_ALIASES[gRaw]] ? GROUP_ALIASES[gRaw] : (GROUPS[GROUP_ALIASES[tRaw]] ? GROUP_ALIASES[tRaw] : '');
+    const email = (ci.email>=0 ? r[ci.email]||'' : '').slice(0,120);
+    if(!name){ errors.push(`Row ${k+(hasHeader?2:1)}: no name, skipped.`); return; }
+    if(gRaw && !group) errors.push(`Row ${k+(hasHeader?2:1)}: department "${r[ci.group]}" not recognized, so ${name} will pick their own.`);
+    let base = (slug(name) + (team ? '-' + slug(team) : '')) || 'person', rid = base, n = 2;
+    while(used.has(rid)) rid = `${base}-${n++}`;
+    used.add(rid);
+    entries.push({rid, name, team, group, email});
+  });
+  if(entries.length > 1000){ errors.push('Only the first 1,000 people were kept.'); entries.length = 1000; }
+  return {entries, errors};
+}
+
+async function loadRoster(quiet){
+  if(!CAP.db || !CAP.admin){ ROSTER = {entries: (ROSTER && ROSTER.entries) || [], local:true}; return; }
+  try{
+    const s = await CAP.db.doc('roster/main').get();
+    ROSTER = s.exists ? {entries: (s.data().entries||[]).slice(), updated: s.data().updated} : {entries:[]};
+  }catch(err){ ROSTER = ROSTER || {entries:[]}; if(!quiet) ROSTER.error = "Couldn't load the saved roster."; }
+}
+
+async function loadRosterPage(){
+  ROSTER = {loading:true, entries:[]}; renderRoster();
+  await loadRoster();
+  ROSTER.done = {};
+  if(CAP.db && CAP.admin){
+    try{
+      const snap = await CAP.db.collection('completions').get();
+      snap.docs.forEach(d=>{ const b=d.data()||{}; (Array.isArray(b.runs)?b.runs:[]).forEach(x=>{ const r = cleanRun(x, d.id); if(!r || !r.rid) return; const cur = ROSTER.done[r.rid]; if(!cur || (r.max?r.score/r.max:0) > (cur.max?cur.score/cur.max:0)) ROSTER.done[r.rid] = r; }); });
+      const uids = [...new Set(Object.values(ROSTER.done).map(r=>r.uid))];
+      ROSTER.profiles = uids.length && CAP.user ? await CAP.user.profiles(uids) : {};
+    }catch(err){}
+  }
+  if(state.route==='roster') renderRoster();
+}
+
+function renderRoster(){
+  document.title = 'A Day Online · Roster';
+  let body;
+  if(!CAP.ready) body = `<p class="hint">Loading…</p>`;
+  else if(IN_VIEWER && !CAP.admin) body = `<p class="hint">Only the page owner and editors can manage the roster.</p>`;
+  else if(!ROSTER){ loadRosterPage(); return; }
+  else if(ROSTER.loading) body = `<p class="hint">Loading roster…</p>`;
+  else {
+    const all = ROSTER.entries || [];
+    const teams = [...new Set(all.map(p=>p.team).filter(Boolean))].sort();
+    const list = all.filter(p=>rosterTeam==='all'||p.team===rosterTeam);
+    const done = ROSTER.done || {};
+    const finished = list.filter(p=>done[p.rid]).length;
+    const draft = rosterDraft ? `<div class="card" style="display:grid;gap:12px"><h3 style="margin:0">Preview: ${rosterDraft.entries.length} people, ${new Set(rosterDraft.entries.map(p=>p.team).filter(Boolean)).size} teams</h3>
+        ${rosterDraft.errors.length?`<ul class="savenote bad" style="margin:0;padding-left:18px">${rosterDraft.errors.slice(0,8).map(x=>`<li>${esc(x)}</li>`).join('')}${rosterDraft.errors.length>8?`<li>…and ${rosterDraft.errors.length-8} more</li>`:''}</ul>`:''}
+        <div class="tablewrap"><table class="report-table"><thead><tr><th>Name</th><th>Team</th><th>Department</th><th>Email</th></tr></thead><tbody>${rosterDraft.entries.slice(0,8).map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.team)}</td><td>${GROUPS[p.group]?esc(GROUPS[p.group].label):'<span class="meta">They choose</span>'}</td><td>${esc(p.email)}</td></tr>`).join('')}</tbody></table></div>
+        ${rosterDraft.entries.length>8?`<p class="hint">Showing 8 of ${rosterDraft.entries.length}.</p>`:''}
+        <div class="actions">${rosterDraft.entries.length?(all.length?`<button class="btn" data-act="ro-save-add">Add ${rosterDraft.entries.length} to roster</button><button class="btn ghost" data-act="ro-save-replace">Replace roster</button>`:`<button class="btn" data-act="ro-save-replace">${CAP.db?'Save roster':'Make links'}</button>`):''}<button class="btn ghost" data-act="ro-cancel">Cancel</button></div></div>` : '';
+    const rows = list.map(p=>{ const r = done[p.rid]; return `<tr><td><b>${esc(p.name)}</b>${p.email?`<br><span class="meta">${esc(p.email)}</span>`:''}</td><td>${esc(p.team||'–')}</td><td>${GROUPS[p.group]?esc(GROUPS[p.group].label):'<span class="meta">They choose</span>'}</td>
+      <td>${CAP.db?(r?`<span class="good">✓ Finished</span><br><span class="meta">${r.score}/${r.max} · ${esc(fmtDate(r.at))}${ROSTER.profiles && ROSTER.profiles[r.uid] && ROSTER.profiles[r.uid].name ? ' · account: '+esc(ROSTER.profiles[r.uid].name) : ''}</span>`:'<span class="meta">Not started</span>'):'<span class="meta">–</span>'}</td>
+      <td><button class="btn ghost" style="padding:6px 12px" data-act="ro-copy" data-rid="${esc(p.rid)}">Copy link</button></td></tr>`; }).join('');
+    body = `<div class="card" style="display:grid;gap:12px">
+        <h3 style="margin:0">Add people</h3>
+        <p class="hint">Paste from Excel or a CSV with columns <b>name, team</b>, and optionally <b>department</b> (Finance, Sales, Manufacturing, IT, HR, Design, SLT) and <b>email</b>. If there's no department column, a team named after a department is used. Each person gets a personal link that fills in their name and team. With a department, the link opens straight into that day.</p>
+        <div class="actions"><label class="btn ghost" for="roFile" style="cursor:pointer">Choose CSV file</label><input id="roFile" type="file" accept=".csv,.txt,.tsv,text/csv" hidden><button class="btn ghost" data-act="ro-template">Get a template</button></div>
+        <textarea id="roText" rows="6" placeholder="name,team,department,email&#10;Jane Example,West Region,Sales,jane@example.com" style="width:100%;font:13px var(--mono);border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--surface);color:var(--ink)"></textarea>
+        <div class="actions"><button class="btn" data-act="ro-preview">Preview list</button></div>
+        <p class="savenote" id="flash" aria-live="polite"></p></div>
+      ${draft}
+      ${all.length?`<div class="card tiles"><div><b>${list.length}</b>people</div><div><b>${teams.length}</b>teams</div>${CAP.db?`<div><b>${finished}/${list.length}</b>finished</div><div><b>${list.length?Math.round(finished/list.length*100):0}%</b>completion</div>`:''}</div>
+      <div class="card" style="display:grid;gap:14px"><div class="toolbar">
+        <div class="actions"><label for="roTeam" class="hint">Team <select id="roTeam"><option value="all">All</option>${teams.map(t=>`<option ${rosterTeam===t?'selected':''}>${esc(t)}</option>`).join('')}</select></label></div>
+        <div class="actions"><button class="btn ghost" data-act="ro-copyall">Copy all links</button><button class="btn" data-act="ro-export">Export links CSV</button></div></div>
+        <label class="namefield" for="roBase" style="max-width:none">Links point to<input id="roBase" value="${esc(linkBase)}"></label>
+        <p class="hint" style="margin:-6px 0 0">Use this page's claude.ai link so results reach your log, or your GitHub Pages address for a public copy (no results log there).</p>
+        <div class="tablewrap"><table class="report-table"><thead><tr><th>Person</th><th>Team</th><th>Department</th><th>Status</th><th>Link</th></tr></thead><tbody>${rows}</tbody></table></div>
+        ${CAP.db?'':'<p class="hint">This copy can\'t save the roster. Export the links CSV to keep them.</p>'}</div>`
+      : `<p class="hint">No roster yet. Add people above to make their personal links.</p>`}
+      ${ROSTER.error?`<p class="savenote bad">${ROSTER.error}</p>`:''}`;
+  }
+  app.innerHTML = `<section class="summary"><div><h2 style="font-size:clamp(1.8rem,4vw,2.6rem)">Roster and personal links</h2><p class="hint">Send each person their own link. Their name and team fill in automatically, and finished days show up here and in the results log.</p></div>${body}</section>`;
+  const f = document.getElementById('roFile');
+  if(f) f.addEventListener('change', ()=>{ const file=f.files[0]; if(!file) return; const rd=new FileReader(); rd.onload=()=>{ document.getElementById('roText').value = rd.result; rosterDraft = draftFrom(rd.result, ROSTER.entries); renderRoster(); }; rd.readAsText(file); });
+  const t = document.getElementById('roTeam'); if(t) t.addEventListener('change', e=>{ rosterTeam = e.target.value; renderRoster(); });
+  const bse = document.getElementById('roBase'); if(bse) bse.addEventListener('change', e=>{ const v=e.target.value.trim(); if(/^https?:\/\//.test(v)) linkBase=v; else e.target.value=linkBase; });
+}
+
+const linksCSV = list => { const q=csvCell; return ['Name,Team,Department,Email,Link', ...list.map(p=>[p.name,p.team,GROUPS[p.group]?GROUPS[p.group].label:'',p.email,linkFor(p)].map(q).join(','))].join('\n'); };
+
+async function rosterAct(act, b){
+  const list = (ROSTER && ROSTER.entries || []).filter(p=>rosterTeam==='all'||p.team===rosterTeam);
+  if(act==='ro-preview'){ rosterDraft = draftFrom(document.getElementById('roText').value, ROSTER.entries); renderRoster(); return; }
+  if(act==='ro-cancel'){ rosterDraft = null; renderRoster(); return; }
+  if(act==='ro-template'){ saveFile('a-day-online-roster-template.csv', 'name,team,department,email\nJane Example,West Region,Sales,jane@example.com\nSam Example,Plant 2,Manufacturing,sam@example.com\n', 'text/csv'); return; }
+  if(act==='ro-save-add' || act==='ro-save-replace'){
+    const next = act==='ro-save-add' ? [...ROSTER.entries, ...rosterDraft.entries] : rosterDraft.entries.slice();
+    if(CAP.db && CAP.admin){
+      b.disabled = true; b.textContent = 'Saving…';
+      try{ await CAP.db.doc('roster/main').set({entries: next.slice(0,1000), updated: Date.now()}); ROSTER.entries = next.slice(0,1000); rosterDraft = null; renderRoster(); flash(`Saved ${ROSTER.entries.length} people.`); }
+      catch(err){ b.disabled=false; b.textContent='Try saving again'; flash(err && err.code==='quota_exceeded' ? 'The roster is too large to save.' : "Couldn't save the roster."); }
+    } else { ROSTER.entries = next; rosterDraft = null; renderRoster(); }
+    return;
+  }
+  if(act==='ro-copy'){
+    const p = ROSTER.entries.find(x=>x.rid===b.dataset.rid); if(!p) return;
+    try{ await navigator.clipboard.writeText(linkFor(p)); b.textContent='Copied'; setTimeout(()=>{ b.textContent='Copy link'; }, 1500); }
+    catch(err){ b.insertAdjacentHTML('afterend', `<input class="fakeinput" style="width:100%;margin-top:6px" readonly value="${esc(linkFor(p))}" onfocus="this.select()">`); b.remove(); }
+    return;
+  }
+  if(act==='ro-copyall'){
+    const tsv = ['Name\tTeam\tEmail\tLink', ...list.map(p=>[p.name,p.team,p.email,linkFor(p)].join('\t'))].join('\n');
+    try{ await navigator.clipboard.writeText(tsv); flash(`Copied ${list.length} links. Paste them into Excel or a mail merge.`); }
+    catch(err){ flash("Copy isn't available here. Use Export links CSV."); }
+    return;
+  }
+  if(act==='ro-export'){ saveFile(`a-day-online-links${rosterTeam==='all'?'':'-'+slug(rosterTeam)}.csv`, linksCSV(list), 'text/csv'); return; }
+}
+
+/* ---------- Routing and events ---------- */
+function render(){
+  const ht = document.getElementById('hoverTip'); if(ht) ht.className = '';
+  chrome();
+  if(state.route==='results') return renderResults();
+  if(state.route==='roster') return renderRoster();
+  const g = GROUPS[state.g];
+  if(!g) renderLanding();
+  else if(state.i<0) renderIntro(g);
+  else if(state.i>=S(g).length && state.view==null) renderSummary(g);
+  else renderScene(g);
+}
+
+function route(){
+  let h = location.hash.slice(1);
+  if(h.startsWith('p-')){
+    const a = decodeAssign(h.slice(2));
+    if(a){ ASSIGN = a; playerName = a.name; playerTeam = a.team; try{ sessionStorage.setItem('adoAssign', JSON.stringify(a)); }catch(err){} }
+    if(a && a.group){ location.replace('#' + a.group); return; }
+    h = '';
+  }
+  state = { route: (h==='results'||h==='roster') ? h : null, g: GROUPS[h] ? h : null, i:-1, phase:'spot', results:[], run:null, saveStatus:null };
+  if(h==='results') RES = null;
+  if(h==='roster') rosterDraft = null;
+  render(); window.scrollTo(0,0);
+}
+
+function toggle(el){
+  if(state.phase!=='spot' || state.view!=null) return;
+  const on = el.classList.toggle('marked'); el.setAttribute('aria-pressed', on);
+  if(tip.classList.contains('show')) showTip(el, tipX, tipY);
+  const mc = document.getElementById('mc'); if(mc) mc.textContent = `${document.querySelectorAll('#stage .hot.marked').length} marked`;
+}
+
+app.addEventListener('click', async e=>{
+  const hot = e.target.closest('#stage .hot'); if(hot){ toggle(hot); return; }
+  const row = e.target.closest('tr[data-run]'); if(row){ resOpen = resOpen===row.dataset.run ? null : row.dataset.run; renderResults(); return; }
+  const b = e.target.closest('button[data-act]'); if(!b) return;
+  const g = GROUPS[state.g], act = b.dataset.act;
+  if(act && act.startsWith('ro-')){ rosterAct(act, b); return; }
+  if(act==='demo-check'){ demoReveal(); return; }
+  if(act==='demo-reset'){ render(); return; }
+  if(act==='copy-report'){
+    const text = reportText(state.run);
+    try{ await navigator.clipboard.writeText(text); flash('Copied.'); }
+    catch(err){ const ta=document.getElementById('copyText'); ta.hidden=false; ta.value=text; ta.focus(); ta.select(); flash('Select all and copy the text below.'); }
+    return;
+  }
+  if(act==='dl-report'){ const r=state.run; saveFile(`a-day-online-${r.group}-${new Date(r.at).toISOString().slice(0,10)}.html`, reportHTML(r), 'text/html'); return; }
+  if(act==='export-csv'){ saveFile(`a-day-online-results-${new Date().toISOString().slice(0,10)}.csv`, csv(), 'text/csv'); return; }
+  if(act==='refresh'){ loadResults(); return; }
+  if(act==='start'){ const n=document.getElementById('playerName'), t=document.getElementById('playerTeam'); if(n) playerName = n.value.trim().slice(0,60); if(t) playerTeam = t.value.trim().slice(0,60); state.deck = buildDeck(g); state.i=0; state.phase='spot'; }
+  if(act==='clear-assign'){ ASSIGN=null; playerName=''; playerTeam=''; try{ sessionStorage.removeItem('adoAssign'); }catch(err){} location.hash=''; return; }
+  if(act==='verdict'){
+    const s = S(g)[state.i], flags = fl(s);
+    const marked = [...document.querySelectorAll('#stage .hot.marked')].map(x=>x.dataset.f);
+    const bad = flags.filter(f=>!f.ok), foundIds = bad.filter(f=>marked.includes(f.id)).map(f=>f.id);
+    const falseAlarms = marked.filter(id=>!flags.some(f=>f.id===id)).length;
+    const correct = b.dataset.v===s.v;
+    state.results[state.i] = {marked, foundIds, found:foundIds.length, total:bad.length, falseAlarms, correct, call:b.dataset.v, points:(correct?10:0)+foundIds.length*5};
+    state.phase='reveal';
+  }
+  if(act==='review-back'){ state.view = null; }
+  if(act==='next'){ state.i++; state.phase='spot'; }
+  if(act==='restart'){ state.i=-1; state.phase='spot'; state.results=[]; state.run=null; state.saveStatus=null; state.deck=null; }
+  render(); window.scrollTo({top:0, behavior:'smooth'});
+});
+const tip = Object.assign(document.createElement('div'), {id:'hoverTip', role:'tooltip'});
+document.body.appendChild(tip);
+let tipX = null, tipY = null;
+function placeTip(x, y){
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  let left = x + 14, top = y + 18;
+  if(left + w > window.innerWidth - 8) left = x - w - 10;
+  if(top + h > window.innerHeight - 8) top = y - h - 12;
+  tip.style.left = Math.max(8, left) + 'px'; tip.style.top = Math.max(8, top) + 'px';
+}
+function showTip(el, x, y){
+  tip.textContent = el.classList.contains('marked') ? 'Selected. Click again to unselect' : 'Select what looks suspicious';
+  if(x == null){ const r = el.getBoundingClientRect(); x = r.left + Math.min(r.width, 40); y = r.bottom - 8; }
+  placeTip(x, y); tip.className = 'show';
+}
+function hideTip(){ tip.className = ''; }
+app.addEventListener('mousemove', e=>{ tipX = e.clientX; tipY = e.clientY; const h = e.target.closest('.spot .hot'); if(h) showTip(h, tipX, tipY); else hideTip(); });
+app.addEventListener('mouseleave', hideTip);
+app.addEventListener('focusin', e=>{ const h = e.target.closest('.spot .hot'); if(h && h.matches(':focus-visible')) showTip(h); });
+app.addEventListener('focusout', hideTip);
+window.addEventListener('scroll', hideTip, {passive:true});
+document.getElementById('timeline').addEventListener('click', e=>{
+  const b = e.target.closest('[data-review]'); if(!b) return;
+  const k = +b.dataset.review;
+  if(state.view==null && state.phase==='spot' && state.i < S(GROUPS[state.g]).length)
+    state.pendingMarks = [...document.querySelectorAll('#stage .hot.marked')].map(x=>x.dataset.f);
+  state.view = (k===state.i && state.phase==='reveal') ? null : k;
+  render(); window.scrollTo({top:0, behavior:'smooth'});
+});
+app.addEventListener('keydown', e=>{ const hot=e.target.closest('#stage .hot'); if(hot && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); toggle(hot); } });
+window.addEventListener('hashchange', route);
+route();
+</script>
+
+</body>
+</html>
